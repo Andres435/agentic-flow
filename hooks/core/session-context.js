@@ -14,23 +14,41 @@ const { execFileSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { writeHookError } = require("./hook-log");
+const { resolveApp } = require("./resolve-app");
 
 const REPO_ROOT = path.join(__dirname, "..", "..");
 
-function loadProfile() {
-  const candidates = [
+function loadProfile(overlayRoot) {
+  const candidates = [];
+  if (overlayRoot) candidates.push(path.join(overlayRoot, "profile.json"));
+  candidates.push(
     path.join(REPO_ROOT, "profile.json"),
     path.join(process.cwd(), "profile.json"),
-    path.join(process.cwd(), ".cursor", "profile.json"),
-  ];
+    path.join(process.cwd(), ".cursor", "profile.json")
+  );
+  const seen = new Set();
   for (const candidate of candidates) {
+    const key = path.resolve(candidate);
+    if (seen.has(key)) continue;
+    seen.add(key);
     try {
       return JSON.parse(fs.readFileSync(candidate, "utf8"));
     } catch (error) {
-      writeHookError("session-context", error);
+      if (error && error.code !== "ENOENT") writeHookError("session-context", error);
     }
   }
   return null;
+}
+
+function readContextSnippet(contextPath) {
+  if (!contextPath) return "";
+  try {
+    const text = fs.readFileSync(contextPath, "utf8").trim();
+    if (!text) return "";
+    return text.length > 2000 ? text.slice(0, 2000) + "…" : text;
+  } catch {
+    return "";
+  }
 }
 
 function detectTicket(hints, profile) {
@@ -58,8 +76,9 @@ function detectTicketFromBranches(profile, reposRoot, plansDir) {
   const open = new Set();
   for (const repo of repos) {
     const name = typeof repo === "string" ? repo : repo && repo.name;
-    if (!name) continue;
-    const repoPath = path.join(reposRoot, name);
+    const rel = typeof repo === "object" && repo && repo.path ? String(repo.path) : name;
+    if (!name && !rel) continue;
+    const repoPath = !rel || rel === "." ? reposRoot : path.join(reposRoot, rel);
     if (!fs.existsSync(repoPath)) continue;
     let branch = "";
     try {
@@ -153,8 +172,8 @@ function manifestHasPr(manifest) {
   return Array.isArray(prs) && prs.some((pr) => pr && (pr.id || pr.url));
 }
 
-function resolveNextAction(ticket) {
-  const plansDir = process.env.AGENTIC_PLANS_DIR || path.join(REPO_ROOT, "plans");
+function resolveNextAction(ticket, plansDirOverride) {
+  const plansDir = plansDirOverride || process.env.AGENTIC_PLANS_DIR || path.join(REPO_ROOT, "plans");
   let manifest;
   try {
     manifest = JSON.parse(fs.readFileSync(path.join(plansDir, ticket + "-manifest.json"), "utf8"));
@@ -171,17 +190,22 @@ function resolveNextAction(ticket) {
 
 /** null when there is nothing to say; otherwise { label, compact, env, text }. */
 function buildPacket(hints) {
-  const profile = loadProfile();
+  const app = resolveApp({ hostRoot: REPO_ROOT, workspaceRoots: hints });
+  const overlay = app ? app.overlay : REPO_ROOT;
+  const plansDir = app ? app.plansDir : process.env.AGENTIC_PLANS_DIR || path.join(REPO_ROOT, "plans");
+  const profile = loadProfile(overlay);
   const slice = profile
     ? { profileId: profile.id || null, ticketSystem: profile.ticketSystem || null, layout: profile.layout || null }
     : null;
+  const reposRoot = app ? app.checkout : path.join(REPO_ROOT, "..");
   const ticket =
     detectTicket(hints, profile) ||
-    detectTicketFromBranches(profile, path.join(REPO_ROOT, ".."), process.env.AGENTIC_PLANS_DIR || path.join(REPO_ROOT, "plans"));
+    detectTicketFromBranches(profile, reposRoot, plansDir);
   if (!ticket && !slice) return null;
 
   const compact = {};
   if (slice) Object.assign(compact, slice);
+  if (app) compact.appId = app.id;
   if (ticket) {
     compact.ticket = ticket;
     const packet = runResolve(ticket);
@@ -191,8 +215,9 @@ function buildPacket(hints) {
       compact.rootExists = packet.rootExists;
       compact.repos = packet.repos;
     }
-    compact.nextAction = resolveNextAction(ticket);
+    compact.nextAction = resolveNextAction(ticket, plansDir);
   }
+  const context = app ? readContextSnippet(app.contextPath) : "";
   const label = ticket ? "Ticket tree for " + ticket : "Profile";
   const env = {
     TMO_TICKET: ticket || "",
@@ -201,8 +226,13 @@ function buildPacket(hints) {
     TMO_PROFILE: slice && slice.profileId ? String(slice.profileId) : "",
     TMO_TICKET_SYSTEM: slice && slice.ticketSystem ? String(slice.ticketSystem) : "",
     TMO_LAYOUT: slice && slice.layout ? String(slice.layout) : "",
+    AGENTIC_APP_OVERLAY: app ? app.overlay : "",
+    AGENTIC_PLANS_DIR: app ? app.plansDir : "",
+    AGENTIC_APP_ID: app ? app.id : "",
   };
-  return { label, compact, env, text: label + ": " + JSON.stringify(compact) };
+  let text = label + ": " + JSON.stringify(compact);
+  if (context) text += "\nApp context:\n" + context;
+  return { label, compact, env, text };
 }
 
 module.exports = { buildPacket, detectTicket, detectTicketFromBranches, loadProfile, resolveNextAction };

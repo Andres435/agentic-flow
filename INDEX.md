@@ -6,11 +6,11 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 
 | Doc | Load when | Keywords |
 |---|---|---|
-| [README.md](README.md) | what this is; folder map; doc budgets; upgrading core | overview, folders, budgets, upgrade |
+| [README.md](README.md) | what this is; host vs one-product; folder map; doc budgets | overview, folders, budgets, upgrade, agentic-flow |
 | [USER-MANUAL.md](USER-MANUAL.md) | running tickets day to day | chats, lifecycle, commands, close gate, tiers |
-| [CUSTOMIZE.md](CUSTOMIZE.md) | first clone; the checklist `/start-new-project` fills | customize, profile, tracker, overlay |
+| [CUSTOMIZE.md](CUSTOMIZE.md) | first clone; `/start-new-project` or `/adopt-project` | customize, profile, tracker, overlay, registry |
 | [MACHINE-SETUP.md](MACHINE-SETUP.md) | new laptop; bootstrap; IDE plugin install | setup, pwsh, hooks, Claude Code, Codex |
-| [TEMPLATE.md](TEMPLATE.md) | maintaining the template: core vs overlay | core, overlay, versioning, porting |
+| [TEMPLATE.md](TEMPLATE.md) | maintaining the host: core vs overlay | core, overlay, versioning, porting, agentic-flow |
 | [AGENTS.md](AGENTS.md) | agent routing, subagent functions, domain router | agents, routing, engineering mode |
 | [profile.json](profile.json) | repos, tracker, prefix, stack command, slash list | repos, ticketSystem, ticketPrefix, slashCommands, uiGlobs |
 | [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) | attribution for adapted ideas | notices, license |
@@ -41,7 +41,9 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | Doc | Load when | Keywords |
 |---|---|---|
 | [skills/ticket-workflow/SKILL.md](skills/ticket-workflow/SKILL.md) | map of phases and owners | lifecycle, phases |
-| [skills/start-new-project/SKILL.md](skills/start-new-project/SKILL.md) | first clone: fill the profile | start-new-project, profile |
+| [skills/start-new-project/SKILL.md](skills/start-new-project/SKILL.md) | greenfield: fill the profile or `apps/<id>/` | start-new-project, profile |
+| [skills/adopt-project/SKILL.md](skills/adopt-project/SKILL.md) | existing checkout: detect, ask gaps, register | adopt-project, registry, detect |
+| [skills/research-x/SKILL.md](skills/research-x/SKILL.md) | optional X search on a spike; no API | research-x, search-x, twitter |
 | [skills/onboard/SKILL.md](skills/onboard/SKILL.md) | machine setup after the profile exists | onboard, setup |
 | [skills/engineering-mode/SKILL.md](skills/engineering-mode/SKILL.md) | pin tier routing for a chat | engineering mode, orchestrator, lanes |
 | [skills/doctor/SKILL.md](skills/doctor/SKILL.md) · [playbook](skills/doctor/playbooks/doctor.md) | health check; lane probe | doctor, hooks, lanes, hook-errors |
@@ -103,6 +105,7 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [plans/README.md](plans/README.md) | what lives under `plans/` (user-local) | plans, artifacts |
 | [plans/examples/ticket-ledger.example.md](plans/examples/ticket-ledger.example.md) | ledger shape | ledger, Lanes, Epoch |
 | [plans/closeout-index.md](plans/closeout-index.md) | durable lessons from closeouts | lessons, priorFindings |
+| [apps/README.md](apps/README.md) | per-app overlays on this host | apps, registry, overlay |
 
 ## Your overlay docs
 

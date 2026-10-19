@@ -12,8 +12,9 @@ color: cyan
 This file is a **read-only map**. It names the doc that owns each phase. Do not execute steps from
 here; invoke the commands directly. If anything here contradicts a command or skill, that file wins.
 
-Setup and context live in **overlay blanks** (`profile.json`, `CUSTOMIZE.md`, `environments/`,
-`agents/`). Fill those once via `/start-new-project`, then `/onboard` for the machine.
+Setup and context live in **overlay blanks** (`profile.json`, `apps/<id>/`, `CUSTOMIZE.md`,
+`environments/`, `agents/`). Fill those once via `/start-new-project` or `/adopt-project`, then
+`/onboard` for the machine.
 Every command below then reads the profile — it does not re-interview the user for stack or repos.
 
 ## Lifecycle overview
@@ -53,6 +54,7 @@ Coworker PR review is `/peer-review` — not on this author path.
 | Coworker PR review | `/peer-review` | [peer-review/SKILL.md](../peer-review/SKILL.md) → [peer-review/playbooks/peer-review.md](../peer-review/playbooks/peer-review.md) |
 | Fresh-chat hydrate | First step of implement, review-changes, complete-task, address-pr-comments | [ticket-context-load/SKILL.md](../ticket-context-load/SKILL.md) |
 | New product | `/start-new-project` | [start-new-project/SKILL.md](../start-new-project/SKILL.md) |
+| Existing checkout | `/adopt-project` | [adopt-project/SKILL.md](../adopt-project/SKILL.md) |
 | New clone / machine | `/onboard` | [onboard/SKILL.md](../onboard/SKILL.md) + [CUSTOMIZE.md](../../CUSTOMIZE.md) |
 
 ## Contracts that override prose

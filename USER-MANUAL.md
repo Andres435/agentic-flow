@@ -1,8 +1,9 @@
 # User manual
 
 Day-to-day ticket workflow for humans. Agents: [AGENTS.md](AGENTS.md). First clone: run
-`/start-new-project` (fills [profile.json](profile.json) and [CUSTOMIZE.md](CUSTOMIZE.md)), then
-`/onboard` for the machine script ([MACHINE-SETUP.md](MACHINE-SETUP.md)). After that, commands run
+`/start-new-project` (blank product) or `/adopt-project` (existing checkout). They fill
+[profile.json](profile.json) or `apps/<id>/`, and [CUSTOMIZE.md](CUSTOMIZE.md). Then `/onboard`
+for the machine script ([MACHINE-SETUP.md](MACHINE-SETUP.md)). After that, commands run
 from the profile and do not re-ask for repos or start commands.
 
 Terms (manifest, tier, lane, receipt, Drive): [glossary](_shared/glossary.md).
@@ -95,6 +96,8 @@ ticket window, review, close. Later commands read the mode from the manifest.
 | You want                                                   | Type                                                |
 | ---------------------------------------------------------- | --------------------------------------------------- |
 | Fill the profile for a new project                         | `/start-new-project`                                |
+| Attach an existing GitHub checkout                         | `/adopt-project`                                    |
+| Search X on a spike (optional)                             | `/research-x`                                       |
 | Machine setup after the profile exists                     | `/onboard`                                          |
 | Pin model routing for the chat                             | `/engineering-mode`                                 |
 | Health check (profile, hooks, gates, lanes)                | `/doctor`                                           |

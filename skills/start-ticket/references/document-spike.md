@@ -10,7 +10,7 @@ Run only from `/document-spike`, after the user asks to write the spike down. Fi
 
 ## What to write
 
-Durable facts a later developer needs: the question, the method, current behavior, constants/limits, risks, the recommendation, and what was not proven. **Do not** paste the Engineering Decisions, Work Plan, or the ticket outcome text verbatim if a shorter page says the same thing. No secrets.
+Durable facts a later developer needs: the question, the method, current behavior, constants/limits, risks, the recommendation, and what was not proven. **Do not** paste the Engineering Decisions, Work Plan, or the ticket outcome text verbatim if a shorter page says the same thing. No secrets. Optional source: [/research-x](../../research-x/SKILL.md) when the page cites current public discussion.
 
 Keep workflow memory in [../../../plans/closeout-index.md](../../../plans/closeout-index.md), not the findings page. Do not draft an ADR here ([adr-policy.md](../../../_shared/adr-policy.md)).
 

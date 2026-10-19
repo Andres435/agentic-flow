@@ -42,6 +42,12 @@ $ErrorActionPreference = 'Stop'
 
 $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $PlansDir = Join-Path $RepoRoot 'plans'
+$resolver = Join-Path (Split-Path $PSScriptRoot -Parent) 'lib/Resolve-AgenticApp.ps1'
+if (Test-Path -LiteralPath $resolver) {
+    . $resolver
+    $app = Resolve-AgenticApp -HostRoot $RepoRoot
+    if ($app.Id) { $PlansDir = $app.PlansDir }
+}
 if (-not $IndexPath) { $IndexPath = Join-Path $PlansDir 'closeout-index.md' }
 
 if ($Repos.Count -eq 1 -and $Repos[0] -match ',') {

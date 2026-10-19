@@ -1,7 +1,7 @@
 ---
 name: harness-verbs
-description: The neutral verbs the shared workflow uses for IDE actions — ask-user, enter-plan / exit-plan, dispatch, report-context, rename-chat — and the one table that maps each verb to Cursor, Claude Code, and Codex. Core docs use the verb; only this file and adapters/ name IDE tools.
-keywords: harness verbs, ask-user, enter-plan, exit-plan, dispatch, report-context, rename-chat, plan mode, IDE neutral, adapter, tool names
+description: The neutral verbs the shared workflow uses for IDE actions — ask-user, enter-plan / exit-plan, dispatch, report-context, rename-chat, search-x — and the one table that maps each verb to Cursor, Claude Code, and Codex. Core docs use the verb; only this file and adapters/ name IDE tools.
+keywords: harness verbs, ask-user, enter-plan, exit-plan, dispatch, report-context, rename-chat, search-x, plan mode, IDE neutral, adapter, tool names
 ---
 
 # Harness Verbs
@@ -24,6 +24,8 @@ Skills, playbooks, and agents name a **verb**, never an IDE tool. Each adapter u
   one; a blank is honest.
 - **`rename-chat`** (optional) — rename the chat to `WI<n> <phase>`. Only where the adapter
   supports it; otherwise skip silently.
+- **`search-x`** (optional) — search public posts on X. No API key. Skip silently where the
+  adapter has no mapping.
 
 ## Map
 
@@ -35,6 +37,7 @@ Skills, playbooks, and agents name a **verb**, never an IDE tool. Each adapter u
 | `dispatch` | `Task` (`subagent_type`, `model`) | `Agent` (`subagent_type`, `model`, `effort`) | `spawn_agent` (`model`, `reasoning_effort`) |
 | `report-context` | hook-measured, or the context-window indicator | hook-measured | blank (no Codex hook) |
 | `rename-chat` | `cursor-app-control` `rename_chat` | not supported | not supported |
+| `search-x` | `XSearch` | not supported — skip | not supported — skip |
 
 Subagent types and tier models: [Cursor](../adapters/cursor/model-usage.md) ·
 [Claude Code](../adapters/claude/model-usage.md) · [Codex](../adapters/codex/model-usage.md) ·

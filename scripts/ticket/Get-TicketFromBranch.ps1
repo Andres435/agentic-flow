@@ -46,18 +46,34 @@ if (-not $ReposRoot) { $ReposRoot = Split-Path $RepoRoot -Parent }
 $prefix = 'TICKET-'
 $names = @()
 $profilePath = Join-Path $RepoRoot 'profile.json'
+$plansDir = Join-Path $RepoRoot 'plans'
+if (-not $Root -and (Get-Command Resolve-AgenticApp -ErrorAction SilentlyContinue)) {
+    $app = Resolve-AgenticApp -HostRoot $RepoRoot
+    if ($app.Id) {
+        $profilePath = $app.ProfilePath
+        $plansDir = $app.PlansDir
+        if ($app.CheckoutRoot) { $ReposRoot = $app.CheckoutRoot }
+    }
+}
 if (Test-Path -LiteralPath $profilePath) {
     $profileJson = Get-Content -LiteralPath $profilePath -Raw | ConvertFrom-Json
     if ($profileJson.PSObject.Properties.Name -contains 'ticketPrefix' -and $profileJson.ticketPrefix) {
         $prefix = [string]$profileJson.ticketPrefix
     }
     if ($profileJson.PSObject.Properties.Name -contains 'repos') {
-        $names = @($profileJson.repos | ForEach-Object { if ($_ -is [string]) { $_ } else { [string]$_.name } } | Where-Object { $_ })
+        $names = @($profileJson.repos | ForEach-Object {
+            if ($_ -is [string]) { return $_ }
+            $rel = [string]$_.path
+            if (-not $rel) { $rel = [string]$_.name }
+            $rel
+        } | Where-Object { $_ })
     }
 }
 
-$paths = @($names | ForEach-Object { Join-Path $ReposRoot $_ })
-$result = Get-TicketKeyFromBranches -RepoPaths $paths -Prefix $prefix -PlansDir (Join-Path $RepoRoot 'plans')
+$paths = @($names | ForEach-Object {
+    if ($_ -eq '.') { $ReposRoot } else { Join-Path $ReposRoot $_ }
+})
+$result = Get-TicketKeyFromBranches -RepoPaths $paths -Prefix $prefix -PlansDir $plansDir
 
 if ($Json) {
     $result | ConvertTo-Json -Compress

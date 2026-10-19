@@ -10,6 +10,10 @@
 Set-StrictMode -Version Latest
 
 . (Join-Path $PSScriptRoot 'TicketPrefix.ps1')
+$script:AgenticAppResolver = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'lib/Resolve-AgenticApp.ps1'
+if ((Test-Path -LiteralPath $script:AgenticAppResolver) -and -not (Get-Command Resolve-AgenticApp -ErrorAction SilentlyContinue)) {
+    . $script:AgenticAppResolver
+}
 $ErrorActionPreference = 'Stop'
 
 function Get-TicketKeyFromRaw {
@@ -86,7 +90,12 @@ function Get-TicketManifestFile {
         [Parameter(Mandatory)][string]$RepoRoot,
         [Parameter(Mandatory)][string]$TicketKey
     )
-    return (Join-Path (Join-Path $RepoRoot 'plans') "$TicketKey-manifest.json")
+    $plans = Join-Path $RepoRoot 'plans'
+    if (Get-Command Resolve-AgenticApp -ErrorAction SilentlyContinue) {
+        $app = Resolve-AgenticApp -HostRoot $RepoRoot
+        if ($app.Id) { $plans = $app.PlansDir }
+    }
+    return (Join-Path $plans "$TicketKey-manifest.json")
 }
 
 # SHA-256 of an empty string. A stamp carrying it reviewed nothing.

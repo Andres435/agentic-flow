@@ -6,7 +6,11 @@ product SDKs are not needed unless your project overlay adds them. Day-to-day ti
 
 ## 1. Folder layout
 
-Place this folder at `<app>/.cursor` (one repo) or `source/repos/.cursor` (sibling repos):
+**Host (many small apps).** Keep this clone as `agentic-flow`. Register each GitHub origin in
+[apps/registry.json](apps/registry.json). Opening that checkout loads this plugin plus `apps/<id>/`.
+Register the user-level `workspaceOpen` hook from [adapters/cursor/README.md](adapters/cursor/README.md).
+
+**One product.** Place this folder at `<app>/.cursor` (one repo) or `source/repos/.cursor` (sibling repos):
 
 ```
 my-app/
@@ -112,7 +116,7 @@ Add this folder as a Codex plugin marketplace and install `agentic`:
 
 ## 6. Day-1 checklist
 
-- [ ] `profile.json` filled (run `/start-new-project`) and `environments/local-dev.md` describes your stack
+- [ ] Overlay filled (`/start-new-project` or `/adopt-project`) and the local-dev card describes the stack
 - [ ] `git config --get core.hooksPath` prints `hooks/git-hooks`
 - [ ] `scripts/ticket/Assert-AgenticFlow.ps1` prints `[PASS]`
 - [ ] `/` in chat lists `start-ticket` once (Cursor) or `/agentic:start-ticket` (Claude Code)

@@ -173,6 +173,10 @@ $TICKET_ROW_PATTERN = '^\|\s*[A-Za-z]+-?\d+'
 
 $RepoRoot = if ($Root) { $Root } else { Split-Path (Split-Path $PSScriptRoot -Parent) -Parent }
 $PlansDir = Join-Path $RepoRoot 'plans'
+if (-not $Root -and (Get-Command Resolve-AgenticApp -ErrorAction SilentlyContinue)) {
+    $app = Resolve-AgenticApp -HostRoot $RepoRoot
+    if ($app.Id) { $PlansDir = $app.PlansDir }
+}
 $OutPath  = Join-Path $PlansDir 'ticket-ledger.md'
 if (-not (Test-Path -LiteralPath $PlansDir)) { New-Item -ItemType Directory -Path $PlansDir -Force | Out-Null }
 

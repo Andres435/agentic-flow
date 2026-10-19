@@ -36,6 +36,7 @@ This surfaces doc-budget, command-shim, retired-artifact, ledger-column, and use
 ```
 node hooks/tests/closeout-guard.test.js
 node hooks/tests/session-context.test.js
+node hooks/tests/resolve-app.test.js
 node hooks/tests/git-push-agentic-flow.test.js
 node hooks/tests/commit-guard.test.js
 git config --get core.hooksPath

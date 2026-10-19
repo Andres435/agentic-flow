@@ -1,5 +1,8 @@
 # `user/` — Recommended Cursor user profile (per machine)
 
+[identity.json](identity.json) holds the X handle for `/research-x` (`xHandle`). Empty means search
+openly. No API token.
+
 Templates for `%APPDATA%\Cursor\User\`. These are **not** applied automatically when you
 `git pull` — Cursor keeps settings outside the workspace.
 

@@ -6,6 +6,8 @@ This folder no longer holds slash entries. A command file whose name matches a s
 | Goal | Command |
 |---|---|
 | Fill profile, env card, and specialist on a new product | `/start-new-project` |
+| Attach an existing GitHub checkout | `/adopt-project` |
+| Search X on a spike (optional, no API) | `/research-x` |
 | Pin for ad-hoc work or a long chat. Do not type it in the same message as a ticket command | `/engineering-mode` |
 | Start a ticket | `/start-ticket <id> bug\|feature\|spike\|refactor` |
 | Build in a fresh chat | `/implement <id>` |

@@ -286,7 +286,7 @@ if (Test-Path -LiteralPath $indexPath) {
             if ($pp.PSObject.Properties.Name -contains 'ticketPrefix' -and $pp.ticketPrefix) { $ticketPrefixForPlans = [string]$pp.ticketPrefix }
         } catch { }
     }
-    $indexExempt = @("plans/$ticketPrefixForPlans*", 'plans/examples/*', '*/fixtures/*', 'tmp/*', 'user/*', 'INDEX.md',
+    $indexExempt = @("plans/$ticketPrefixForPlans*", 'plans/examples/*', 'apps/*/plans/*', '*/fixtures/*', 'tmp/*', 'user/*', 'INDEX.md',
         'CLAUDE.md', '*/CLAUDE.md', 'adapters/*/workspace-*', '*/README.md', '*/README.markdown', '*/_README.md')
     $tracked = @()
     Push-Location -LiteralPath $Root
@@ -712,7 +712,7 @@ if (-not (Test-Path -LiteralPath $claimsPath)) {
 $requiredSlash = @(
     'engineering-mode', 'start-ticket', 'review-changes', 'complete-task', 'prep-pr',
     'implement', 'start-stack', 'swap-stack', 'stop-stack', 'address-pr-comments',
-    'peer-review', 'start-new-project', 'doctor', 'onboard'
+    'peer-review', 'start-new-project', 'adopt-project', 'research-x', 'doctor', 'onboard'
 )
 $planShapes = @('bug-fix', 'feature-plan', 'tech-spike', 'document-spike')
 $slashListed = @()

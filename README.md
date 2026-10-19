@@ -1,9 +1,12 @@
-# cursor-agentic-template
+# agentic-flow
 
-A ticket-driven agentic workflow for any product. Cursor, Claude Code, and Codex each load it as a
+A ticket-driven agentic workflow. Cursor, Claude Code, and Codex each load it as a
 plugin (`.cursor-plugin/`, `.claude-plugin/`, `.codex-plugin/`). Claude Code is the only IDE that has run the
 enforcement gates end to end; Cursor is untested against them and the Codex adapter is experimental. The
-shared core names verbs and model tiers. [adapters/](adapters/README.md) maps them per IDE. Product specifics live in
+shared core names verbs and model tiers. [adapters/](adapters/README.md) maps them per IDE.
+
+Use this clone as **one host for many small apps** (`apps/<id>/` plus [apps/registry.json](apps/registry.json)),
+or copy it beside a product the way TMO does. Product specifics live in that overlay
 [profile.json](profile.json), not in the core.
 
 **Day-to-day usage:** [USER-MANUAL.md](USER-MANUAL.md). **First clone:** [CUSTOMIZE.md](CUSTOMIZE.md).
@@ -11,7 +14,8 @@ shared core names verbs and model tiers. [adapters/](adapters/README.md) maps th
 (core vs overlay). **Finding a doc:** [INDEX.md](INDEX.md). **Terms** (manifest, tier, lane,
 receipt): [glossary](_shared/glossary.md).
 
-> Place this folder at `<your-app>/.cursor`, or at `source/repos/.cursor` (or any sibling name) in a
+> **Host:** keep this folder as `agentic-flow` and register each personal GitHub repo in `apps/`.
+> **One product:** place this folder at `<your-app>/.cursor`, or at `source/repos/.cursor` in a
 > multi-repo workspace. Paths in the docs are relative to this folder.
 
 ## What you get
@@ -44,9 +48,9 @@ receipt): [glossary](_shared/glossary.md).
 
 ## Quick start
 
-1. Use this repo as a GitHub template (or clone it and delete `.git`), and place it as above.
-2. Run `/start-new-project`. It fills `profile.json`, the [CUSTOMIZE.md](CUSTOMIZE.md) checklist,
-   and `environments/local-dev.md`.
+1. Clone this host (or copy it beside one product as `.cursor`).
+2. Blank product: `/start-new-project`. Existing checkout: `/adopt-project`. They fill
+   `apps/<id>/` or the root [profile.json](profile.json) and [CUSTOMIZE.md](CUSTOMIZE.md).
 3. Bootstrap the machine once: `scripts/machine/Initialize-WorkflowMachine.ps1`
    ([MACHINE-SETUP.md](MACHINE-SETUP.md)).
 4. Run tickets:
@@ -75,7 +79,8 @@ Pin engineering mode for ad-hoc work, or for a long chat.
 | [adapters/](adapters/README.md) | Per-IDE tier maps and hook bridges | Core |
 | [output-styles/](output-styles/engineering-mode.md) | Engineering mode output style (Claude Code) | Core |
 | [commands/](commands/_README.md) | Menu notes. No shim duplicates a skill | Core |
-| [profile.json](profile.json) | Repos, tracker, prefix, stack command, slash list | **Overlay** |
+| [profile.json](profile.json) | Host (or one-product) overlay: repos, tracker, prefix, stack, slash list | **Overlay** |
+| [apps/](apps/README.md) | Per-app overlays and [registry.json](apps/registry.json) when this clone is the host | **Overlay** |
 | [agents/](agents/README.markdown) | Specialists (stub: `fullstack-specialist.md`) | **Overlay** |
 | [environments/](environments/README.md) | Setup cards (stub: `local-dev.md`) | **Overlay** |
 | [rules/](rules/) | Cursor rules (stub pointers) | Overlay |
@@ -122,7 +127,7 @@ the claim then fails any doc that still says the old thing.
 Core files can be copied from this repo without touching your overlay:
 
 ```bash
-git remote add upstream https://github.com/Andres435/cursor-agentic-template.git
+git remote add upstream https://github.com/Andres435/agentic-flow.git
 git fetch upstream
 git checkout upstream/main -- skills/ _shared/ scripts/ticket/ scripts/machine/ hooks/ adapters/ output-styles/
 ```
