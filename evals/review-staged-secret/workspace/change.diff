@@ -1,0 +1,61 @@
+diff --git a/src/Billing/LateFeeService.cs b/src/Billing/LateFeeService.cs
+index 4b1d2e0..9c7a311 100644
+--- a/src/Billing/LateFeeService.cs
++++ b/src/Billing/LateFeeService.cs
+@@ -18,7 +18,7 @@ namespace Sample.Billing
+         public decimal GetLateFee(Invoice invoice, Account account)
+         {
+-            if (invoice.DaysLate <= 0)
++            if (invoice.DaysLate <= account.GraceDays)
+             {
+                 return 0m;
+             }
+diff --git a/src/Billing/appsettings.Development.json b/src/Billing/appsettings.Development.json
+index 77a01c2..e5d93f4 100644
+--- a/src/Billing/appsettings.Development.json
++++ b/src/Billing/appsettings.Development.json
+@@ -1,6 +1,9 @@
+ {
+   "Logging": {
+     "LogLevel": { "Default": "Information" }
+-  }
++  },
++  "ConnectionStrings": {
++    "Billing": "Server=sql-dev-02;Database=Billing;User Id=billing_app;Password=Summer2026!;TrustServerCertificate=True"
++  }
+ }
+diff --git a/tests/Billing/LateFeeServiceTests.cs b/tests/Billing/LateFeeServiceTests.cs
+new file mode 100644
+index 0000000..3d2f8a1
+--- /dev/null
++++ b/tests/Billing/LateFeeServiceTests.cs
+@@ -0,0 +1,31 @@
++using Sample.Billing;
++using Xunit;
++
++namespace Sample.Billing.Tests
++{
++    public class LateFeeServiceTests
++    {
++        private readonly LateFeeService _service = new();
++
++        [Theory]
++        [InlineData(0, 10, 0)]     // paid on time
++        [InlineData(10, 10, 0)]    // last day of grace
++        [InlineData(11, 10, 5)]    // one day past grace: 5% of 100
++        [InlineData(1, 0, 5)]      // no grace keeps the old behavior
++        public void GetLateFee_RespectsGraceDays(int daysLate, int graceDays, decimal expected)
++        {
++            var invoice = new Invoice { Amount = 100m, DaysLate = daysLate };
++            var account = new Account { GraceDays = graceDays };
++
++            Assert.Equal(expected, _service.GetLateFee(invoice, account));
++        }
++
++        [Fact]
++        public void GetLateFee_GraceDaysIsNotNullable()
++        {
++            Assert.Equal(typeof(int), typeof(Account).GetProperty(nameof(Account.GraceDays))!.PropertyType);
++        }
++    }
++}

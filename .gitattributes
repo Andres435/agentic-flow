@@ -1,2 +1,3 @@
-# Git runs these hooks under sh: a CRLF checkout (core.autocrlf=true) breaks the shebang line.
+# Bash runs these: a CRLF checkout (core.autocrlf=true) breaks "set -euo pipefail" and the shebang.
+*.sh text eol=lf
 hooks/git-hooks/* text eol=lf
