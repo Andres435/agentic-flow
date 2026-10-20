@@ -45,6 +45,9 @@
          spans that name this repo unambiguously are hard-checked (see the setup
          comment); a missing path git ignores is a runtime file and passes.
 
+    Scope: the docs git sees (tracked plus new untracked, not ignored), so a
+    Claude Code session worktree nested at .claude/worktrees/ is not scanned.
+
     This is a CORRECTNESS gate, not a growth gate. Assert-DocBudget.ps1 owns
     size. Exit 0 = pass, 1 = at least one hard failure.
 
@@ -104,8 +107,31 @@ function Test-InsideRepo {
     return $FullPath.StartsWith($RootFull + [IO.Path]::DirectorySeparatorChar) -or $FullPath -eq $RootFull
 }
 
-$docs = @(Get-ChildItem -LiteralPath $RootFull -Recurse -File -Include '*.md', '*.mdc', '*.markdown' -ErrorAction SilentlyContinue |
-    Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' })
+# The docs as git sees them: tracked plus new untracked files, minus ignored ones. A new doc
+# is checked before its first commit, and a Claude Code session worktree nested at
+# .claude/worktrees/<name>/ (git-excluded) is not scanned as if it were this repo -- its links
+# to sibling repos resolve one level too deep from there. Outside a git checkout (tests, an
+# exported copy) walk the tree instead, skipping any folder that is its own checkout.
+$atGitRoot = $false
+if (Get-Command git -ErrorAction SilentlyContinue) {
+    $gitPrefix = & git -C $RootFull rev-parse --show-prefix 2>$null
+    $atGitRoot = $LASTEXITCODE -eq 0 -and -not "$gitPrefix".Trim()
+}
+if ($atGitRoot) {
+    $docs = @(& git -C $RootFull -c core.quotePath=false ls-files --cached --others --exclude-standard -- '*.md' '*.mdc' '*.markdown' 2>$null |
+        ForEach-Object { Join-Path $RootFull $_ } |
+        Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |  # deleted, not yet staged
+        ForEach-Object { Get-Item -LiteralPath $_ -Force })
+} else {
+    $nestedRoots = @(Get-ChildItem -LiteralPath $RootFull -Recurse -Force -Filter '.git' -ErrorAction SilentlyContinue |
+        Where-Object { $_.FullName -ne (Join-Path $RootFull '.git') } |
+        ForEach-Object { (Split-Path $_.FullName -Parent) + [IO.Path]::DirectorySeparatorChar })
+    $docs = @(Get-ChildItem -LiteralPath $RootFull -Recurse -File -Include '*.md', '*.mdc', '*.markdown' -ErrorAction SilentlyContinue |
+        Where-Object {
+            $full = $_.FullName
+            $full -notmatch '[\\/]\.git[\\/]' -and -not ($nestedRoots | Where-Object { $full.StartsWith($_) })
+        })
+}
 
 # --- 4. inline code paths: setup --------------------------------------------
 # A backticked path is a pointer the model follows just like a link. A span is checked

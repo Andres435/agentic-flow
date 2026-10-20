@@ -66,6 +66,12 @@ BeforeAll {
     }
 
     $clean = New-RepoCopy 'clean'
+    # Like the main clone while a Claude Code session runs: a git-excluded worktree nested at
+    # .claude/worktrees/<name>/ whose docs hold links that do not resolve from there.
+    Add-Content -LiteralPath (Join-Path $clean '.git/info/exclude') -Value '.claude/worktrees/'
+    Add-Text $clean '.claude/worktrees/x/.git' 'gitdir: ../../../.git/worktrees/x'
+    Add-Text $clean '.claude/worktrees/x/_shared/glossary.md' '[gone](does-not-exist.md)'
+    Add-Text $clean '.claude/worktrees/x/skills/doctor/SKILL.md' 'See source/worktrees/TICKET-12345 for the tree.'
     $script:Clean = Invoke-Gate $clean
 
     $bad = New-RepoCopy 'violations'
@@ -103,6 +109,10 @@ Describe 'Assert-AgenticFlow on a copy of this repo' {
     It 'passes the clean copy' {
         $script:Clean.Out | Should -Match '\[PASS\] Agentic flow'
         $script:Clean.Code | Should -Be 0
+    }
+
+    It 'does not scan a session worktree nested at .claude/worktrees/' {
+        $script:Clean.Out | Should -Not -Match '\.claude[/\\]worktrees'
     }
 
     It 'fails the copy with violations' {
