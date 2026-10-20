@@ -6,15 +6,17 @@ enforcement gates end to end; Cursor is untested against them and the Codex adap
 shared core names verbs and model tiers. [adapters/](adapters/README.md) maps them per IDE.
 
 Use this clone as **one host for many small apps** (`apps/<id>/` plus `apps/registry.json`, both kept out of git),
-or copy it beside a product the way TMO does. Product specifics live in that overlay
+or copy it beside one product made of several related repos. Product specifics live in that overlay
 [profile.json](profile.json), not in the core.
 
 **Day-to-day usage:** [USER-MANUAL.md](USER-MANUAL.md). **First clone:** [CUSTOMIZE.md](CUSTOMIZE.md).
 **New laptop:** [MACHINE-SETUP.md](MACHINE-SETUP.md). **Maintainers:** [TEMPLATE.md](TEMPLATE.md)
 (core vs overlay). **Finding a doc:** [INDEX.md](INDEX.md). **Terms** (manifest, tier, lane,
-receipt): [glossary](_shared/glossary.md).
+receipt): [glossary](_shared/glossary.md). **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md).
+**License:** [Apache-2.0](LICENSE).
 
-> **Host:** keep this folder as `agentic-flow` and register each personal GitHub repo in `apps/`.
+> **Host:** clone this folder once (the name is yours to pick; the docs say `agentic-flow`) and
+> register each personal GitHub repo in `apps/`.
 > **One product:** place this folder at `<your-app>/.cursor`, or at `source/repos/.cursor` in a
 > multi-repo workspace. Paths in the docs are relative to this folder.
 
@@ -124,7 +126,8 @@ the claim then fails any doc that still says the old thing.
 
 ## Upgrading core in a project
 
-Core files can be copied from this repo without touching your overlay:
+Core files can be copied from this repo without touching your overlay. The URL is an example:
+point `upstream` at the template you track (this repo or your fork).
 
 ```bash
 git remote add upstream https://github.com/Andres435/agentic-flow.git
