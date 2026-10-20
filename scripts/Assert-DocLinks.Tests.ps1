@@ -100,3 +100,43 @@ Describe 'Assert-DocLinks stale code paths' {
         $r.Out | Should -Not -Match '\.state\.json'
     }
 }
+
+Describe 'Assert-DocLinks scan scope' {
+    # A Claude Code session worktree nests a full checkout at .claude/worktrees/<name>/. Its
+    # links to sibling repos resolve one level too deep from there, so it must not be scanned.
+    BeforeAll {
+        function Add-NestedWorktree([string]$Root) {
+            $nested = Join-Path $Root '.claude/worktrees/x'
+            New-Item -ItemType Directory -Path (Join-Path $nested '_shared') -Force | Out-Null
+            Set-Content -LiteralPath (Join-Path $nested '.git') -Value 'gitdir: ../../../.git/worktrees/x'
+            Set-Content -LiteralPath (Join-Path $nested '_shared/review.md') -Value '[gone](does-not-exist.md)' -Encoding UTF8
+        }
+    }
+
+    It 'skips a git-excluded session worktree and still fails a broken link in a repo doc' {
+        $root = New-Workspace 'nested-git'
+        & git -C $root init -q
+        Add-Content -LiteralPath (Join-Path $root '.git/info/exclude') -Value '.claude/worktrees/'
+        Add-NestedWorktree $root
+        Write-Skill $root '[ok](../../rules/x.mdc)'
+        $r = Invoke-Gate $root
+        $r.Code | Should -Be 0
+        $r.Out | Should -Not -Match '\.claude/worktrees'
+
+        Write-Skill $root '[gone](missing.md)'
+        $r = Invoke-Gate $root
+        $r.Code | Should -Be 1
+        $r.Out | Should -Match 'skills/a/SKILL\.md\s+-> missing\.md'
+        $r.Out | Should -Not -Match '\.claude/worktrees'
+    }
+
+    It 'skips a folder with its own .git when the root is not a git checkout' {
+        $root = New-Workspace 'nested-plain'
+        Add-NestedWorktree $root
+        Write-Skill $root '[gone](missing.md)'
+        $r = Invoke-Gate $root
+        $r.Code | Should -Be 1
+        $r.Out | Should -Match 'missing\.md'
+        $r.Out | Should -Not -Match '\.claude/worktrees'
+    }
+}

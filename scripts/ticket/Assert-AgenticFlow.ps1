@@ -654,8 +654,9 @@ if (-not (Test-Path -LiteralPath $claimsPath)) {
             $claimFiles = @(& git ls-files --cached --others --exclude-standard 2>$null | ForEach-Object { $_ -replace '\\', '/' })
         } finally { Pop-Location }
         if (-not $claimFiles.Count) {
+            # No git: walk the tree, minus a session worktree nested at .claude/worktrees/.
             $claimFiles = @(Get-ChildItem -LiteralPath $Root -Recurse -File -ErrorAction SilentlyContinue |
-                Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]' } |
+                Where-Object { $_.FullName -notmatch '[\\/]\.git[\\/]|[\\/]\.claude[\\/]worktrees[\\/]' } |
                 ForEach-Object { $_.FullName.Substring($Root.Length).TrimStart('\', '/') -replace '\\', '/' })
         }
         $claimFiles = @($claimFiles | Where-Object {
