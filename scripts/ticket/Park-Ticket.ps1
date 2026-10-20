@@ -123,6 +123,9 @@ $now = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
 try {
     if ($alreadyParked) {
         # A hand-stamped park has no spans; give it the closed original span so hours exclude the gap.
+        if (-not (Get-Field $manifest 'parkedOutcome')) {
+            Merge-TicketManifestFields -ManifestPath $manifestPath -Patch @{ parkedOutcome = $Outcome }
+        }
         $existing = @(@(Get-Field $manifest 'spans') | Where-Object { $_ })
         if ($existing.Count -eq 0 -and -not (Get-Field $manifest 'completedAtUtc')) {
             $one = [pscustomobject]@{
