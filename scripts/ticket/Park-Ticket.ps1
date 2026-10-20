@@ -122,7 +122,20 @@ if (-not $PSCmdlet.ShouldProcess($Key, "park ticket ($Outcome)")) {
 $now = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
 try {
     if ($alreadyParked) {
-        Write-Output "[OK] park step 2 (span): already parked at $(Get-Field $manifest 'parkedAtUtc'); kept"
+        # A hand-stamped park has no spans; give it the closed original span so hours exclude the gap.
+        $existing = @(@(Get-Field $manifest 'spans') | Where-Object { $_ })
+        if ($existing.Count -eq 0 -and -not (Get-Field $manifest 'completedAtUtc')) {
+            $one = [pscustomobject]@{
+                kind         = 'original'
+                startedAtUtc = ConvertTo-IsoUtcText (Get-Field $manifest 'startedAtUtc')
+                endedAtUtc   = ConvertTo-IsoUtcText (Get-Field $manifest 'parkedAtUtc')
+            }
+            Merge-TicketManifestFields -ManifestPath $manifestPath -Patch @{ spans = @($one) }
+            Write-Output "[OK] park step 2 (span): already parked at $($one.endedAtUtc); original span added"
+        }
+        else {
+            Write-Output "[OK] park step 2 (span): already parked at $(Get-Field $manifest 'parkedAtUtc'); kept"
+        }
     }
     else {
         $spans = New-Object System.Collections.Generic.List[object]

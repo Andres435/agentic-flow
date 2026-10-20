@@ -122,6 +122,21 @@ Describe 'Park-Ticket' {
         @(Get-LedgerRows $root).Count | Should -Be 0
     }
 
+    It 'a hand-stamped park (no spans) gets its original span, a ledger row and the park gate' {
+        # Mon 2026-03-02 15:00Z to 17:00Z: 2 hours, no idle gap.
+        $root = New-TicketRoot 'hand' @{
+            startedAtUtc = '2026-03-02T15:00:00Z'; parkedAtUtc = '2026-03-02T17:00:00Z'
+            parkedState = 'More Info Needed'; parkedHours = 16.0
+        }
+        $r = Invoke-Park -Root $root
+        $r.ExitCode | Should -Be 0
+        $m = Get-Manifest $root
+        @($m.spans).Count | Should -Be 1
+        @($m.spans)[0].kind | Should -Be 'original'
+        $m.parkedHours | Should -Be 2
+        (Get-LedgerCells @(Get-LedgerRows $root)[0])[4] | Should -Be '2'
+    }
+
     It '-WhatIf writes nothing' {
         $root = New-TicketRoot 'whatif'
         $r = Invoke-Script $script:ParkScript @('-Ticket', 'TICKET-9', '-Outcome', 'more-info', '-Root', $root, '-WhatIf')
