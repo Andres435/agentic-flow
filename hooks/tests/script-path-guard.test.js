@@ -35,7 +35,11 @@ check("off by default: a script in temp is allowed", () => {
   assert.strictEqual(decideWrite(TEMP + String.raw`\x.ps1`), null);
   assert.strictEqual(decideRun(String.raw`pwsh -File "` + TEMP + String.raw`\x.ps1"`), null);
 });
-process.env.AGENTIC_SCRIPT_ALLOW_ROOT = String.raw`[\\/]source[\\/]repos[\\/]`;
+// The anchored example from MACHINE-SETUP.md. The home prefix expands to os.homedir(), which
+// reads USERPROFILE on Windows and HOME elsewhere; pin both so the tests run the same anywhere.
+process.env.AGENTIC_SCRIPT_ALLOW_ROOT = String.raw`^(?:[A-Za-z]:[\\/]Users[\\/][^\\/]+|/(?:home|Users)/[^/]+)[\\/]source[\\/]repos[\\/]`;
+process.env.USERPROFILE = String.raw`C:\Users\a`;
+process.env.HOME = String.raw`C:\Users\a`;
 
 check("write: script in temp is denied", () => assert(decideWrite(TEMP + String.raw`\x.ps1`)));
 check("write: python in Documents is denied", () => assert(decideWrite(String.raw`C:\Users\a\Documents\GitHub\x.py`)));
@@ -46,6 +50,29 @@ check("write: relative path is allowed", () => assert.strictEqual(decideWrite("s
 check("write: .. out of source\\repos is denied", () =>
   assert(decideWrite(REPO + String.raw`\..\..\..\AppData\Local\Temp\x.ps1`)));
 
+check("write: source\\repos nested under another folder is denied", () =>
+  assert(decideWrite(String.raw`C:\Temp\source\repos\x.ps1`)));
+check("write: <allowed>\\..\\..\\Temp is denied", () =>
+  assert(decideWrite(String.raw`C:\Users\a\source\repos\..\..\Temp\x.ps1`)));
+check("write: ~ inside the root is allowed", () => assert.strictEqual(decideWrite("~/source/repos/app/x.ps1"), null));
+check("write: ~ outside the root is denied", () => assert(decideWrite("~/AppData/Local/Temp/x.ps1")));
+
+check("run: source\\repos nested under another folder is denied", () =>
+  assert(decideRun(String.raw`pwsh -File C:\Temp\source\repos\x.ps1`)));
+check("run: <allowed>\\..\\..\\Temp is denied", () =>
+  assert(decideRun(String.raw`pwsh -File C:\Users\a\source\repos\..\..\Temp\x.ps1`)));
+check("run: %USERPROFILE% inside the root is allowed", () =>
+  assert.strictEqual(decideRun(String.raw`pwsh -File %USERPROFILE%\source\repos\app\x.ps1`), null));
+check("run: %USERPROFILE% outside the root is denied", () =>
+  assert(decideRun(String.raw`pwsh -File %USERPROFILE%\Downloads\x.ps1`)));
+check("run: ~ and $HOME inside the root are allowed", () => {
+  assert.strictEqual(decideRun("python ~/source/repos/app/x.py"), null);
+  assert.strictEqual(decideRun("pwsh $HOME/source/repos/app/x.ps1"), null);
+});
+check("run: ~ and $env:USERPROFILE outside the root are denied", () => {
+  assert(decideRun("python ~/Documents/x.py"));
+  assert(decideRun(String.raw`pwsh $env:USERPROFILE\source\repos\..\..\x.ps1`));
+});
 check("run: pwsh -File in temp is denied", () => assert(decideRun('pwsh -File "' + TEMP + String.raw`\x.ps1"`)));
 check("run: python in /tmp is denied", () => assert(decideRun("python /tmp/x.py")));
 check("run: env-rooted TEMP is denied", () => assert(decideRun(String.raw`pwsh $env:TEMP\x.ps1`)));
