@@ -27,7 +27,7 @@ the initialization script.
 
 1. If the user wants a **new** product and no `apps/<id>/` overlay exists yet, stop and tell them
    to run `/start-new-project`. If they opened an **existing** checkout that is not in
-   [apps/registry.json](../../apps/registry.json), tell them to run `/adopt-project`. If the root
+   `apps/registry.json`, tell them to run `/adopt-project`. If the root
    `profile.json` `id` is still `customize-me` and they are using this clone as the product itself,
    same: `/start-new-project`. Do not interview for those here, and do not start a ticket until
    that command has run.

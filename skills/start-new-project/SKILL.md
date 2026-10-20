@@ -48,7 +48,7 @@ After the user confirms the draft, write `stacks` as `{ "default": "all", "prese
 ### Personal app on this host
 
 1. `apps/<id>/profile.json`, `context.md`, `environments/local-dev.md`, specialist under `apps/<id>/agents/` if needed, `.cursor-plugin/plugin.json` (rules and agents only).
-2. `apps/registry.json` — `{ "id", "origin" }` once origin is known (after `gh`, or a path they name).
+2. `apps/registry.json` — `{ "id", "origin" }` once origin is known (after `gh`, or a path they name). Create it from `registry.example.json` when missing. It and `apps/<id>/` are gitignored: never stage them.
 3. Scaffold the new app: README, gitignore, `AGENTS.md`, shared `.cursor/rules`, and a CI stub that matches the chosen devops. Personal `context.md` stays in the host.
 4. [CUSTOMIZE.md](../../CUSTOMIZE.md) — record the **Choices** for this app under the registry section.
 
