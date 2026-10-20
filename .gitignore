@@ -20,6 +20,9 @@ plans/*
 !plans/workflow-template-plan.md
 !plans/examples/
 
+# Per-app ticket files on this host. Overlays stay tracked; the ledger does not.
+apps/*/plans/*
+
 # Measured context and the one active-stack owner (dotfile on macOS and Linux).
 scripts/.ctx-usage.json
 scripts/.active-stack.json

@@ -1,17 +1,23 @@
 # Customize this workflow for your project
 
-Run `/start-new-project`. It asks five short batches and fills `profile.json`, the status boxes
-below, and `environments/local-dev.md`. Hand-editing this file still works.
+Two layouts:
 
-Sections marked `(required)` must be done before running `/start-ticket`.
+- **One product** (TMO-style). This clone sits next to related repos. `/start-new-project` fills
+  the root `profile.json`, the status boxes below, and `environments/local-dev.md`.
+- **Many small GitHub apps.** Keep this host (`agentic-flow`) once. `/start-new-project` (blank
+  product) or `/adopt-project` (existing checkout) writes `apps/<id>/` and a row in
+  [apps/registry.json](apps/registry.json). Personal context stays here; `AGENTS.md` and shared
+  rules go in the app.
+
+Hand-editing still works. Sections marked `(required)` must be done before `/start-ticket`.
 
 **Rule:** these blanks are setup and context. After they are filled, `/start-ticket` and the rest of
-the workflow run **automatically** from `profile.json` — they will not re-interview you for repos,
+the workflow run **automatically** from that profile — they will not re-interview you for repos,
 stack, or specialists.
 
 ## Status
 
-`/start-new-project` checks these and records the answers under Choices.
+`/start-new-project` or `/adopt-project` checks these and records the answers under Choices.
 
 - [ ] `profile.json`
 - [ ] `environments/local-dev.md`

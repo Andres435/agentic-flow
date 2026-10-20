@@ -13,6 +13,7 @@
   "commands": [],
   "skills": [
     "./skills/address-pr-comments",
+    "./skills/adopt-project",
     "./skills/architect",
     "./skills/blast-radius",
     "./skills/complete-task",
@@ -24,6 +25,7 @@
     "./skills/onboard",
     "./skills/peer-review",
     "./skills/prep-pr",
+    "./skills/research-x",
     "./skills/review-changes",
     "./skills/script-authoring",
     "./skills/start-new-project",

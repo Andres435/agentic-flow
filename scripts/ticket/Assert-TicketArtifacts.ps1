@@ -104,6 +104,10 @@ if ($Ticket -match '^(?<pre>[A-Za-z]+-?)\d') {
 }
 $RepoRoot = if ($Root) { $Root } else { Split-Path (Split-Path $PSScriptRoot -Parent) -Parent }
 $PlansDir = Join-Path $RepoRoot 'plans'
+if (-not $Root -and (Get-Command Resolve-AgenticApp -ErrorAction SilentlyContinue)) {
+    $app = Resolve-AgenticApp -HostRoot $RepoRoot
+    if ($app.Id) { $PlansDir = $app.PlansDir }
+}
 $ScratchDir = Join-Path (Join-Path $RepoRoot 'tmp') 'tickets'
 
 $missing = [System.Collections.Generic.List[string]]::new()

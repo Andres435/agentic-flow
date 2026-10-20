@@ -7,7 +7,9 @@ What is **core** (stable across products) vs **overlay** (per project).
 | Path | Notes |
 |---|---|
 | `skills/<name>/SKILL.md` | One folder per skill. `playbooks/` and `references/` sit beside it |
-| `skills/start-new-project/` | Fills `profile.json` for a new product |
+| `skills/start-new-project/` | Greenfield: fills root `profile.json` or `apps/<id>/` |
+| `skills/adopt-project/` | Existing checkout: detect, ask gaps, write `apps/<id>/` |
+| `skills/research-x/` | Optional `search-x` on spikes. No X API |
 | `skills/architect/`, `skills/blast-radius/` | Design lanes and what-could-break proof for shared changes |
 | `scripts/ticket/` | Artifact gate, epoch, ledger, review stamp, verify receipt, stack smoke, lanes, measured Ctx%, one-call close (`Close-Ticket.ps1`), opt-in external panel lanes (`Invoke-ExternalLane.ps1`, `user/external-lanes.example.json`), eval case selection (`Select-EvalCases.ps1` with `evals/case-map.psd1`; the template ships no cases), doc claims and doc-sync (`doc-claims.psd1`: a project appends its own claims) |
 | `scripts/machine/` | Machine init, user-level slash links, git hooks, Claude overlay |
@@ -31,7 +33,8 @@ What is **core** (stable across products) vs **overlay** (per project).
 
 | Path | Notes |
 |---|---|
-| `profile.json` | Product config. `/start-new-project` fills it. Do not drop `slashCommands` |
+| `profile.json` | Host or one-product config. `/start-new-project` fills it. Do not drop `slashCommands` |
+| `apps/` | Per-app overlays and `registry.json` when this clone is the host |
 | `CUSTOMIZE.md` | Checklist |
 | `agents/` | Specialists |
 | `environments/` | Env cards |
@@ -43,7 +46,8 @@ What is **core** (stable across products) vs **overlay** (per project).
 ## Versioning
 
 Tag releases as `core-vX.Y.Z`. Projects copy core files from a tag.
-Do not `git merge` a product repo into this template.
+Do not `git merge` a product repo into this host. The GitHub name is `agentic-flow` (the old
+`cursor-agentic-template` URL redirects).
 
 ## Adding to core
 

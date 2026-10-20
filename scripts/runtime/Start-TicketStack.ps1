@@ -40,9 +40,17 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib/StackServices.ps1')
+$resolver = Join-Path (Split-Path $PSScriptRoot -Parent) 'lib/Resolve-AgenticApp.ps1'
+if (Test-Path -LiteralPath $resolver) { . $resolver }
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-if (-not $ProfilePath) { $ProfilePath = Join-Path $repoRoot 'profile.json' }
+$app = $null
+if (Get-Command Resolve-AgenticApp -ErrorAction SilentlyContinue) {
+    $app = Resolve-AgenticApp -HostRoot $repoRoot
+}
+if (-not $ProfilePath) {
+    $ProfilePath = if ($app -and $app.Id) { $app.ProfilePath } else { Join-Path $repoRoot 'profile.json' }
+}
 if (-not (Test-Path -LiteralPath $ProfilePath)) {
     Write-Error "profile.json not found at $ProfilePath."
     exit 1
@@ -80,7 +88,8 @@ if ($Ticket) {
 
 $statePath = Join-Path $PSScriptRoot '.stack-services.state.json'
 try {
-    $started = @(Start-StackServices -Services $ordered -RepoRoot $repoRoot -StatePath $statePath -Setup:$Setup -Cmdlet $PSCmdlet)
+    $stackRoot = if ($app -and $app.Id -and $app.CheckoutRoot) { $app.CheckoutRoot } else { $repoRoot }
+    $started = @(Start-StackServices -Services $ordered -RepoRoot $stackRoot -StatePath $statePath -Setup:$Setup -Cmdlet $PSCmdlet)
 } catch {
     Write-Host "[FAIL] $($_.Exception.Message)" -ForegroundColor Red
     Write-Host '       Services already started are recorded; run Stop-TicketStack.ps1 to clean up.'

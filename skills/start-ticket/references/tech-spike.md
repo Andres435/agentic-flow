@@ -32,6 +32,8 @@ The persisted plan keeps:
 
 Options stay in this plan only when they change the recommendation. Do not require two or three fully written options. Do not paste this plan onto the ticket. When `git blame` or `git log` reveals historical ticket ids, look them up read-only; do not write to them.
 
+When current public discussion would change the answer, optionally run [/research-x](../../research-x/SKILL.md) (`search-x`). Skip it when the repo already answers the question. It is not a close gate.
+
 If the recommendation sets a genuinely new architectural precedent no Accepted ADR covers, name it as an ADR-stub candidate for the implementing ticket to draft — a spike proposes, it does not draft or accept the ADR.
 
 ## What the ticket gets

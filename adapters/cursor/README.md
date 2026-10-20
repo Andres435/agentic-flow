@@ -19,9 +19,11 @@ points `commands` and `skills` at empty folders so the picker is not filled with
 Reload the window after the first install.
 
 If this folder has another name, Cursor does not read it as `.cursor`. [hooks/workspace-open.js](hooks/workspace-open.js)
-is a user-level `workspaceOpen` hook that returns this folder in `pluginPaths`; register it in
+is a user-level `workspaceOpen` hook that returns this folder in `pluginPaths` (and `apps/<id>/`
+when the opened origin is in [apps/registry.json](../../apps/registry.json)); register it in
 `%USERPROFILE%\.cursor\hooks.json`. Do not also keep a real `.cursor` folder in the same workspace,
-or every slash command shows twice.
+or every slash command shows twice. An unregistered app still loads this host so `/adopt-project`
+can run.
 
 ## What stays in the repo root
 

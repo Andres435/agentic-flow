@@ -28,6 +28,8 @@ $ErrorActionPreference = 'Stop'
 
 $commands = @(
     @{ Want = 'Fill the profile for a new project'; Type = '`/start-new-project`' }
+    @{ Want = 'Attach an existing GitHub checkout'; Type = '`/adopt-project`' }
+    @{ Want = 'Search X on a spike (optional)'; Type = '`/research-x`' }
     @{ Want = 'Machine setup after the profile exists'; Type = '`/onboard`' }
     @{ Want = 'Pin model routing for the chat'; Type = '`/engineering-mode`' }
     @{ Want = 'Health check (profile, hooks, gates, lanes)'; Type = '`/doctor`' }

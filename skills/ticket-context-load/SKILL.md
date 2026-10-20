@@ -9,7 +9,7 @@ color: blue
 # Ticket Context Load
 
 A new chat has **no** ticket context. Everything it needs was already computed by `/start-ticket` and
-written to `.cursor/plans/`. This skill loads that state.
+written to `plans/` (or `apps/<id>/plans/` when this host registered the opened origin). This skill loads that state.
 
 Without it, a fresh chat has only whatever prose the user pasted, so it re-derives scope and
 re-plans. That is the failure this skill exists to prevent.
