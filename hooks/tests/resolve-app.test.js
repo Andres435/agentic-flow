@@ -5,7 +5,7 @@ const assert = require("assert");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { normalizeOrigin, matchRegistry, resolveApp, pluginPathsForOpen } = require("../core/resolve-app.js");
+const { normalizeOrigin, loadRegistry, matchRegistry, resolveApp, pluginPathsForOpen } = require("../core/resolve-app.js");
 
 let passed = 0;
 let failed = 0;
@@ -95,6 +95,45 @@ test("unregistered origin still loads the host plugin", () => {
   });
   assert.strictEqual(paths.length, 1);
   assert.strictEqual(path.resolve(paths[0]), path.resolve(tmp));
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test("loadRegistry returns no apps when the registry is missing or not valid JSON", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "agentic-reg-"));
+  assert.deepStrictEqual(loadRegistry(tmp), []);
+  fs.mkdirSync(path.join(tmp, "apps"));
+  fs.writeFileSync(path.join(tmp, "apps", "registry.json"), '{ "apps": [ ');
+  assert.deepStrictEqual(loadRegistry(tmp), []);
+  fs.rmSync(tmp, { recursive: true, force: true });
+});
+
+test("matchRegistry skips entries without an id or origin", () => {
+  const apps = [{ origin: "https://github.com/Andres435/foo.git" }, { id: "foo" }];
+  assert.strictEqual(matchRegistry(apps, "https://github.com/Andres435/foo.git"), null);
+});
+
+test("resolveApp uses the git toplevel as the checkout, like Resolve-AgenticApp.ps1", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "agentic-top-"));
+  const top = path.join(tmp, "checkout");
+  const sub = path.join(top, "src");
+  fs.mkdirSync(sub, { recursive: true });
+  const app = resolveApp({
+    hostRoot: tmp,
+    workspaceRoots: [sub],
+    apps: [{ id: "foo", origin: "https://github.com/Andres435/foo.git" }],
+    gitOriginFn: () => "https://github.com/Andres435/foo.git",
+    gitToplevelFn: () => top,
+  });
+  assert.ok(app);
+  assert.strictEqual(app.checkout, path.resolve(top));
+  const noGit = resolveApp({
+    hostRoot: tmp,
+    workspaceRoots: [sub],
+    apps: [{ id: "foo", origin: "https://github.com/Andres435/foo.git" }],
+    gitOriginFn: () => "https://github.com/Andres435/foo.git",
+    gitToplevelFn: () => "",
+  });
+  assert.strictEqual(noGit.checkout, path.resolve(sub));
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 

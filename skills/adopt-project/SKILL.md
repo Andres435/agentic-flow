@@ -39,7 +39,7 @@ Do not invent defaults for tracker, ticket prefix, or worktrees.
 ## Writes (after the user confirms the draft)
 
 1. `apps/<id>/` — `profile.json` (`stacks` as `{ "default": "all", "presets": { "all": [] }, "services": [ ... ] }`; no `startCommand`), `context.md`, `environments/local-dev.md`, `rules/` as needed, `.cursor-plugin/plugin.json` (rules and agents only).
-2. `apps/registry.json` — append `{ "id", "origin" }`.
+2. `apps/registry.json` — append `{ "id", "origin" }` (create it from `registry.example.json` when missing). It and `apps/<id>/` are gitignored: never stage them.
 3. In the **app** checkout, only files that are missing: `AGENTS.md`, shared `.cursor/rules`, and a CI note that matches the detected devops. Personal `context.md` stays in the host.
 
 Then tell the user the next command is `/doctor`, then `/start-ticket <id> feature`.
