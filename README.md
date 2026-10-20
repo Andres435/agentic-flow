@@ -5,7 +5,7 @@ plugin (`.cursor-plugin/`, `.claude-plugin/`, `.codex-plugin/`). Claude Code is 
 enforcement gates end to end; Cursor is untested against them and the Codex adapter is experimental. The
 shared core names verbs and model tiers. [adapters/](adapters/README.md) maps them per IDE.
 
-Use this clone as **one host for many small apps** (`apps/<id>/` plus [apps/registry.json](apps/registry.json)),
+Use this clone as **one host for many small apps** (`apps/<id>/` plus `apps/registry.json`, both kept out of git),
 or copy it beside one product made of several related repos. Product specifics live in that overlay
 [profile.json](profile.json), not in the core.
 
@@ -82,7 +82,7 @@ Pin engineering mode for ad-hoc work, or for a long chat.
 | [output-styles/](output-styles/engineering-mode.md) | Engineering mode output style (Claude Code) | Core |
 | [commands/](commands/_README.md) | Menu notes. No shim duplicates a skill | Core |
 | [profile.json](profile.json) | Host (or one-product) overlay: repos, tracker, prefix, stack, slash list | **Overlay** |
-| [apps/](apps/README.md) | Per-app overlays and [registry.json](apps/registry.json) when this clone is the host | **Overlay** |
+| [apps/](apps/README.md) | Per-app overlays and `registry.json` when this clone is the host (local, gitignored) | **Overlay** |
 | [agents/](agents/README.markdown) | Specialists (stub: `fullstack-specialist.md`) | **Overlay** |
 | [environments/](environments/README.md) | Setup cards (stub: `local-dev.md`) | **Overlay** |
 | [rules/](rules/) | Cursor rules (stub pointers) | Overlay |

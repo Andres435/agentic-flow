@@ -44,6 +44,19 @@ function gitOrigin(dir) {
   }
 }
 
+function gitToplevel(dir) {
+  if (!dir) return "";
+  try {
+    return execFileSync("git", ["-C", dir, "rev-parse", "--show-toplevel"], {
+      encoding: "utf8",
+      timeout: 3000,
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
 function loadRegistry(hostRoot) {
   const file = path.join(hostRoot, "apps", "registry.json");
   try {
@@ -79,13 +92,18 @@ function resolveApp(opts) {
   const hostRoot = opts.hostRoot;
   const roots = Array.isArray(opts.workspaceRoots) ? opts.workspaceRoots : [];
   const originFn = typeof opts.gitOriginFn === "function" ? opts.gitOriginFn : gitOrigin;
+  const toplevelFn = typeof opts.gitToplevelFn === "function" ? opts.gitToplevelFn : gitToplevel;
   const apps = Array.isArray(opts.apps) ? opts.apps : loadRegistry(hostRoot);
   for (const root of roots) {
     if (!root) continue;
-    const checkout = path.resolve(root);
-    const origin = originFn(checkout);
+    const opened = path.resolve(root);
+    const origin = originFn(opened);
     const app = matchRegistry(apps, origin);
     if (!app) continue;
+    // Same checkout as Resolve-AgenticApp.ps1: the git toplevel, so a subfolder open still
+    // finds repos with path "." at the repository root.
+    const top = toplevelFn(opened);
+    const checkout = top ? path.resolve(top) : opened;
     const overlay = path.join(hostRoot, "apps", String(app.id));
     return {
       id: String(app.id),

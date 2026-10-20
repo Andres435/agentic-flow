@@ -1,8 +1,7 @@
 # `user/` — Recommended Cursor user profile (per machine)
 
-`user/identity.json` holds the X handle for `/research-x` (`xHandle`). Copy
-[identity.example.json](identity.example.json) to it; git ignores it so your handle stays local.
-Absent or empty means search openly. No API token.
+`identity.local.json` (gitignored; copy [identity.example.json](identity.example.json)) holds the X handle
+for `/research-x` (`xHandle`). Missing or empty means search openly. No API token.
 
 Templates for `%APPDATA%\Cursor\User\`. These are **not** applied automatically when you
 `git pull` — Cursor keeps settings outside the workspace.

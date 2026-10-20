@@ -194,6 +194,9 @@ Describe 'Set-VerifyReceipt' {
         $overlay = Join-Path $root 'apps/demo'
         New-Item -ItemType Directory -Path (Join-Path $overlay 'plans') -Force | Out-Null
         '{"mode":"branch"}' | Set-Content -LiteralPath (Join-Path $overlay 'plans/WI00020-manifest.json') -Encoding UTF8
+        # The overlay counts only when the registry lists its id (Resolve-AgenticApp).
+        '{ "apps": [ { "id": "demo", "origin": "https://github.com/someone/demo.git" } ] }' |
+            Set-Content -LiteralPath (Join-Path $root 'apps/registry.json') -Encoding UTF8
         $prev = $env:AGENTIC_APP_OVERLAY
         $env:AGENTIC_APP_OVERLAY = $overlay
         try {

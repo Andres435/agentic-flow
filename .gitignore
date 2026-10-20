@@ -19,8 +19,11 @@ plans/*
 !plans/closeout-index.md
 !plans/examples/
 
-# Per-app ticket files on this host. Overlays stay tracked; the ledger does not.
-apps/*/plans/*
+# Per-app overlays and the registry on this host. This repo is public and both name personal
+# repos and hold personal context, so only the README and the example registry are tracked.
+apps/*
+!apps/README.md
+!apps/registry.example.json
 
 # Measured context and the one active-stack owner (dotfile on macOS and Linux).
 scripts/.ctx-usage.json
@@ -36,6 +39,3 @@ tmp/
 user/external-lanes.local.json
 scripts/*.log
 testResults.xml
-
-# Personal identity (X handle for /research-x). Copy user/identity.example.json.
-user/identity.json
