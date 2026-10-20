@@ -137,7 +137,7 @@ if (Test-Path -LiteralPath $CatalogPath) {
     }
 }
 
-# There is deliberately no fall-through to plans/WI*-closeout.md. Those files are
+# There is deliberately no fall-through to plans/<ticket>-closeout.md. Those files are
 # now written only for the rare ticket whose retrospective earned a page, and that
 # ticket's lesson is already an index row -- scanning them would re-read whole
 # files to rediscover a line that is one grep away. The catalog is scored against

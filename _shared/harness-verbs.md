@@ -19,10 +19,10 @@ Skills, playbooks, and agents name a **verb**, never an IDE tool. Each adapter u
   subagent type and the tier to a model (and an effort, where the IDE has one), and declares
   `deepLane: inline | dispatch`.
 - **`report-context`** — record this chat's context occupancy:
-  `Set-TicketCtxPct.ps1 -Ticket WI<n> -Phase <start|review|close>`. Omit `-Percent` to use the
+  `Set-TicketCtxPct.ps1 -Ticket <ticket> -Phase <start|review|close>`. Omit `-Percent` to use the
   value the IDE hook measured. Pass `-Percent` only when you can read a real number. Never invent
   one; a blank is honest.
-- **`rename-chat`** (optional) — rename the chat to `WI<n> <phase>`. Only where the adapter
+- **`rename-chat`** (optional) — rename the chat to `<ticket> <phase>`. Only where the adapter
   supports it; otherwise skip silently.
 - **`search-x`** (optional) — search public posts on X. No API key. Skip silently where the
   adapter has no mapping.

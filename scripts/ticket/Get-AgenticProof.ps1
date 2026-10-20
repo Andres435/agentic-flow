@@ -21,7 +21,7 @@
     stamps still describe the staged work (Test-ReviewedWorkPresent).
 
 .PARAMETER Ticket
-    Work item, with or without the WI prefix.
+    Work item, with or without the profile ticketPrefix.
 
 .PARAMETER Repo
     Repo name as it appears in the manifest's verify/reviewReady entries.

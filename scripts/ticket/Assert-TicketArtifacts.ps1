@@ -41,7 +41,7 @@
                    frontend. Then close fails unless the effective status is passed
                    (current work, user confirmed). A spike skips that check.
 
-    Session timestamps live in the manifest. The retired WI<n>-session.json is still
+    Session timestamps live in the manifest. The retired <ticket>-session.json is still
     accepted as a fallback so tickets started before that change can close.
 
     Exit code 0 = pass, 1 = fail.
@@ -197,7 +197,7 @@ function Test-PriorLessonCites {
 }
 
 function Test-PlanFile {
-    # Prefer the workType-derived name; accept any WI<n>-*-plan.md so a spike/refactor
+    # Prefer the workType-derived name; accept any <ticket>-*-plan.md so a spike/refactor
     # naming variation does not produce a false failure.
     param([switch]$CheckDigest)
 
@@ -376,7 +376,7 @@ function Test-Manifest {
 }
 
 <#
-    Session timestamps moved from WI<n>-session.json into the manifest. Read the
+    Session timestamps moved from <ticket>-session.json into the manifest. Read the
     manifest first and fall back to the retired file, so a ticket started before
     the change can still close.
 #>
@@ -471,7 +471,7 @@ function Test-AdrIndex {
 }
 
 <#
-    Replaces the per-ticket WI<n>-closeout.md check. A full closeout page is now
+    Replaces the per-ticket <ticket>-closeout.md check. A full closeout page is now
     written only when the retrospective earns one, but every closed ticket must
     leave exactly one ledger row -- written by scripts/ticket/Update-TicketLedger.ps1.
 #>
