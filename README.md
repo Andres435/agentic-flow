@@ -118,7 +118,9 @@ exempt. Before adding any always-on doc or MCP tool, read the token-class law in
 [_shared/severity-and-output.md](_shared/severity-and-output.md).
 
 **Docs stay true by check, not by care.** `Assert-DocLinks.ps1` fails a broken link and a
-backticked path into this folder that does not exist. Changing a gate, stamp script, hook, or
+backticked path into this folder that does not exist. It scans the docs git sees (tracked plus
+new untracked, not ignored), so a session worktree nested at `.claude/worktrees/` is skipped;
+outside a git checkout it walks the tree and skips any folder with its own `.git`. Changing a gate, stamp script, hook, or
 lifecycle skill? Update the doc that describes it in the same branch, or add a commit trailer
 `Docs-Unaffected: <ruleId>: <why>` (`scripts/ticket/Assert-DocSync.ps1`). Changing a fact the docs
 state (what blocks close, chat counts, ...)? Edit its claim in `scripts/ticket/doc-claims.psd1`;
