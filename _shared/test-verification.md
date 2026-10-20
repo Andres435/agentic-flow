@@ -16,6 +16,8 @@ full-repo suite.
 3. Broaden to a parent domain test set only when shared behavior or cross-component contracts changed.
 4. Report unrelated restore, analyzer, or dependency failures instead of escalating to a full-suite run.
    Run the full suite only when the user asks.
+5. Write the `.trx` or log to one fixed scratch path per repo, `tmp/<ticket>-<repo>-verify.trx`, and overwrite
+   it each run; never `full2_`/`full3_` copies. `Set-VerifyReceipt.ps1` copies it to `plans/evidence/<ticket>/`.
 
 ## Bug fix and feature policy
 

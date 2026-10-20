@@ -137,6 +137,77 @@ Describe 'Set-VerifyReceipt' {
         $entry.evidence.PSObject.Properties.Name | Should -Not -Contain 'counts'
     }
 
+    It 'copies the evidence to plans/evidence/<Key>/<Repo>-verify<ext> and records the relative path' {
+        $root = New-ManifestRoot 'ev-copy'
+        $trx = New-Trx 'Scratch-Name.TRX' 5 5 0
+        & $script:Verify -Ticket WI00020 -Repo app -Tests pass -Sonar ok -Evidence $trx -Root $root
+        $copy = Join-Path $root 'plans/evidence/WI00020/app-verify.trx'
+        Test-Path -LiteralPath $copy | Should -BeTrue
+        Test-Path -LiteralPath $trx | Should -BeTrue
+        $entry = (Get-Manifest $root).verify.repos.app
+        $entry.evidence.path | Should -Be 'plans/evidence/WI00020/app-verify.trx'
+        $entry.evidence.sha256 | Should -Be (Get-FileHash -LiteralPath $copy -Algorithm SHA256).Hash.ToLowerInvariant()
+        $entry.evidence.sha256 | Should -Be (Get-FileHash -LiteralPath $trx -Algorithm SHA256).Hash.ToLowerInvariant()
+        $entry.evidence.counts.total | Should -Be 5
+        $entry.evidenceVersion | Should -Be 1
+    }
+
+    It 'a second run with a different file overwrites the one copy and updates the sha' {
+        $root = New-ManifestRoot 'ev-overwrite'
+        $first = New-Trx 'full.trx' 5 5 0
+        $second = New-Trx 'full2.trx' 9 9 0
+        & $script:Verify -Ticket WI00020 -Repo app -Tests pass -Sonar ok -Evidence $first -Root $root
+        $sha1 = (Get-Manifest $root).verify.repos.app.evidence.sha256
+        & $script:Verify -Ticket WI00020 -Repo app -Tests pass -Sonar ok -Evidence $second -Root $root
+        $files = @(Get-ChildItem -LiteralPath (Join-Path $root 'plans/evidence/WI00020') -File)
+        $files.Count | Should -Be 1
+        $files[0].Name | Should -Be 'app-verify.trx'
+        $entry = (Get-Manifest $root).verify.repos.app
+        $entry.evidence.sha256 | Should -Not -Be $sha1
+        $entry.evidence.sha256 | Should -Be (Get-FileHash -LiteralPath $second -Algorithm SHA256).Hash.ToLowerInvariant()
+        $entry.evidence.counts.total | Should -Be 9
+    }
+
+    It 'keeps one copy per repo and leaves the source untouched' {
+        $root = New-ManifestRoot 'ev-two-repos'
+        $a = New-Evidence 'a.log' 'alpha'
+        & $script:Verify -Ticket WI00020 -Repo app -Tests pass -Sonar ok -Evidence $a -Root $root
+        & $script:Verify -Ticket WI00020 -Repo api -Tests pass -Sonar ok -Evidence (New-Evidence 'b.LOG' 'beta') -Root $root
+        $names = @(Get-ChildItem -LiteralPath (Join-Path $root 'plans/evidence/WI00020') -File | ForEach-Object Name | Sort-Object)
+        $names | Should -Be @('api-verify.log', 'app-verify.log')
+        [System.IO.File]::ReadAllText($a) | Should -Be 'alpha'
+    }
+
+    It 'does not error when the evidence already is the destination file' {
+        $root = New-ManifestRoot 'ev-same'
+        $dir = Join-Path $root 'plans/evidence/WI00020'
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        $dest = Join-Path $dir 'app-verify.log'
+        [System.IO.File]::WriteAllText($dest, 'already here')
+        & $script:Verify -Ticket WI00020 -Repo app -Tests pass -Sonar ok -Evidence $dest -Root $root
+        [System.IO.File]::ReadAllText($dest) | Should -Be 'already here'
+        (Get-Manifest $root).verify.repos.app.evidence.path | Should -Be 'plans/evidence/WI00020/app-verify.log'
+    }
+
+    It 'with an active app, copies the evidence beside the manifest of that app, not in the host plans/' {
+        $root = Join-Path $TestDrive 'ev-app'
+        $overlay = Join-Path $root 'apps/demo'
+        New-Item -ItemType Directory -Path (Join-Path $overlay 'plans') -Force | Out-Null
+        '{"mode":"branch"}' | Set-Content -LiteralPath (Join-Path $overlay 'plans/WI00020-manifest.json') -Encoding UTF8
+        $prev = $env:AGENTIC_APP_OVERLAY
+        $env:AGENTIC_APP_OVERLAY = $overlay
+        try {
+            & $script:Verify -Ticket WI00020 -Repo app -Tests pass -Sonar ok -Evidence (New-Evidence 'app-ev.log') -Root $root
+        }
+        finally {
+            if ($null -eq $prev) { Remove-Item Env:AGENTIC_APP_OVERLAY -ErrorAction SilentlyContinue } else { $env:AGENTIC_APP_OVERLAY = $prev }
+        }
+        Test-Path -LiteralPath (Join-Path $overlay 'plans/evidence/WI00020/app-verify.log') | Should -BeTrue
+        Test-Path -LiteralPath (Join-Path $root 'plans/evidence') | Should -BeFalse
+        $m = Get-Content -LiteralPath (Join-Path $overlay 'plans/WI00020-manifest.json') -Raw | ConvertFrom-Json
+        $m.verify.repos.app.evidence.path | Should -Be 'plans/evidence/WI00020/app-verify.log'
+    }
+
     It 'records no evidence for not-run' {
         $root = New-ManifestRoot 'ev-not-run'
         & $script:Verify -Ticket WI00020 -Repo app -Tests not-run -Sonar not-run -Reason 'docs-only' -Root $root

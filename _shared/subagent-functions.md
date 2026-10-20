@@ -103,8 +103,8 @@ result, so its own context window stays lean (the subagent burns its own window 
   sonar: OK | ERROR(condition) | skipped(not enrolled) | skipped(no key)
   evidence: <.trx or saved test output path>   # not for not-run
   ```
-- **Parent records it:** the subagent stays read-only. The parent runs `scripts/ticket/Set-VerifyReceipt.ps1`
-  per packet with `-Evidence <evidence>` (`OK`→`ok`, `ERROR`→`error`, `skipped(...)`→`not-run`; `not-run` tests pass `-Reason`). `Assert-TicketArtifacts -Phase close` reads it.
+- **Parent records it:** the subagent writes evidence to one stable path per repo (`tmp/<ticket>-<repo>-verify.trx`, same name each run) and stays read-only. The parent runs `scripts/ticket/Set-VerifyReceipt.ps1`
+  per packet with `-Evidence <evidence>` (`OK`→`ok`, `ERROR`→`error`, `skipped(...)`→`not-run`; `not-run` tests pass `-Reason`); it copies the file into `plans/evidence/<ticket>/`. `Assert-TicketArtifacts -Phase close` reads it.
 
 ## `review-diff(repo) -> findings`
 

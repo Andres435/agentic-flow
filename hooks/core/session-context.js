@@ -15,6 +15,7 @@ const fs = require("fs");
 const path = require("path");
 const { writeHookError } = require("./hook-log");
 const { resolveApp } = require("./resolve-app");
+const { findPwshOnPath } = require("./pwsh.js");
 
 const REPO_ROOT = path.join(__dirname, "..", "..");
 
@@ -188,8 +189,55 @@ function resolveNextAction(ticket, plansDirOverride) {
   return "review-changes";
 }
 
+const SWEEP_REL = path.join("scripts", "Clear-WorkflowScratch.ps1");
+
+/**
+ * Once per UTC day, start the scratch sweep detached so tmp/ never outgrows its window.
+ * The script writes tmp/.last-sweep itself after a real run; a failed run is retried next
+ * session. Never throws, never waits. Options (tests): { root, spawn, now, env, findHost }.
+ */
+function maybeSweep(options = {}) {
+  try {
+    const env = options.env || process.env;
+    if (env.TMO_SKIP_SWEEP === "1") return false;
+    const root = options.root || REPO_ROOT;
+    const today = (options.now ? new Date(options.now) : new Date()).toISOString().slice(0, 10);
+    let last = "";
+    try {
+      last = fs.readFileSync(path.join(root, "tmp", ".last-sweep"), "utf8").trim();
+    } catch {
+      // no marker yet: sweep
+    }
+    if (last.slice(0, 10) === today) return false;
+    const host = (options.findHost || findPwshOnPath)();
+    if (!host) return false;
+    const spawn = options.spawn || require("child_process").spawn;
+    const child = spawn(
+      host,
+      ["-NoProfile", "-NonInteractive", "-File", path.join(root, SWEEP_REL), "-Quiet"],
+      { detached: true, stdio: "ignore", windowsHide: true }
+    );
+    if (child && typeof child.on === "function") child.on("error", () => {});
+    if (child && typeof child.unref === "function") child.unref();
+    return true;
+  } catch (error) {
+    try {
+      writeHookError("session-context", error);
+    } catch {
+      // logging is best effort
+    }
+    return false;
+  }
+}
+
 /** null when there is nothing to say; otherwise { label, compact, env, text }. */
-function buildPacket(hints) {
+function buildPacket(hints, options) {
+  const packet = buildPacketCore(hints);
+  maybeSweep(options);
+  return packet;
+}
+
+function buildPacketCore(hints) {
   const app = resolveApp({ hostRoot: REPO_ROOT, workspaceRoots: hints });
   const overlay = app ? app.overlay : REPO_ROOT;
   const plansDir = app ? app.plansDir : process.env.AGENTIC_PLANS_DIR || path.join(REPO_ROOT, "plans");
@@ -235,4 +283,4 @@ function buildPacket(hints) {
   return { label, compact, env, text };
 }
 
-module.exports = { buildPacket, detectTicket, detectTicketFromBranches, loadProfile, resolveNextAction };
+module.exports = { buildPacket, maybeSweep, detectTicket, detectTicketFromBranches, loadProfile, resolveNextAction };

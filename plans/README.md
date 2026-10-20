@@ -14,8 +14,10 @@ user who ran the ticket and is gitignored. Git tracks only this README,
 Moving computers: copy `plans/` yourself; git will not carry it.
 
 **Per-ticket only.** Scratch — cached tracker dumps, commit and PR-body drafts — lives in
-`../tmp/tickets/` and is gitignored. If a file is regenerable from the tracker or from git, it does
-not belong here. The contract is [../_shared/ticket-artifacts.md](../_shared/ticket-artifacts.md).
+`../tmp/tickets/` and is gitignored. `plans/evidence/<ticket>/` holds the verify evidence copy for a
+ticket; it is user-local and pruned 14 days after close. If a file is regenerable from the tracker or
+from git, it does not belong here. The contract is [../_shared/ticket-artifacts.md](../_shared/ticket-artifacts.md).
+Retention runs are in `../scripts/Clear-WorkflowScratch.ps1`.
 
 Humans: [../USER-MANUAL.md](../USER-MANUAL.md) (reload these files instead of re-fetching the ticket).
 

@@ -39,8 +39,10 @@
 
 .PARAMETER Evidence
     Required with -Tests pass or fail; ignored for not-run. A test result file (.trx)
-    or a captured console log. Its path, sha256, byte size and kind (trx|log) are
-    recorded on the entry. A .trx also records counts (total, passed, failed); a pass
+    or a captured console log. It is copied to evidence/<Key>/<Repo>-verify<ext> in
+    the plans folder next to the manifest (plans/, or apps/<id>/plans/ for an app; a re-run overwrites it;
+    the source is left alone), and that path (relative to the folder holding plans/), its
+    sha256, byte size and kind (trx|log) are recorded on the entry. A .trx also records counts (total, passed, failed); a pass
     is refused when failed > 0 or total is 0. Close re-hashes the file if it still exists.
 
 .PARAMETER Root
@@ -89,12 +91,7 @@ if ($Tests -ne 'not-run') {
     }
     $evFull = (Resolve-Path -LiteralPath $Evidence).ProviderPath
     $evKind = if ($evFull -match '\.trx$') { 'trx' } else { 'log' }
-    $evidenceObj = [ordered]@{
-        path   = ($Evidence -replace '\\', '/')
-        sha256 = (Get-FileHash -LiteralPath $evFull -Algorithm SHA256).Hash.ToLowerInvariant()
-        bytes  = (Get-Item -LiteralPath $evFull).Length
-        kind   = $evKind
-    }
+    $counts = $null
     if ($evKind -eq 'trx') {
         $xml = New-Object System.Xml.XmlDocument
         $xml.Load($evFull)
@@ -105,12 +102,30 @@ if ($Tests -ne 'not-run') {
             passed = [int]$counters.GetAttribute('passed')
             failed = [int]$counters.GetAttribute('failed')
         }
-        $evidenceObj.counts = [pscustomobject]$counts
         if ($Tests -eq 'pass') {
             if ($counts.failed -gt 0) { throw "-Tests pass but $Evidence reports $($counts.failed) failed test(s)." }
             if ($counts.total -eq 0) { throw "-Tests pass but $Evidence ran zero tests; a pass with zero tests is not evidence." }
         }
     }
+
+    # Keep the evidence in an evidence folder beside the manifest (plans/ or apps/<id>/plans/), one fixed name per ticket and
+    # repo so a re-run overwrites the last result. The source stays where it was (tmp scratch).
+    $evExt = [System.IO.Path]::GetExtension($evFull).ToLowerInvariant()
+    $safeRepo = $Repo -replace '[^A-Za-z0-9._-]', '_'
+    $evDir = Join-Path (Join-Path (Split-Path -Parent $manifestPath) 'evidence') $Key
+    $evDest = Join-Path $evDir "$safeRepo-verify$evExt"
+    New-Item -ItemType Directory -Path $evDir -Force | Out-Null
+    $sameFile = (Test-Path -LiteralPath $evDest -PathType Leaf) -and
+        ([System.IO.Path]::GetFullPath($evFull) -eq [System.IO.Path]::GetFullPath((Resolve-Path -LiteralPath $evDest).ProviderPath))
+    if (-not $sameFile) { Copy-Item -LiteralPath $evFull -Destination $evDest -Force }
+
+    $evidenceObj = [ordered]@{
+        path   = "plans/evidence/$Key/$safeRepo-verify$evExt"
+        sha256 = (Get-FileHash -LiteralPath $evDest -Algorithm SHA256).Hash.ToLowerInvariant()
+        bytes  = (Get-Item -LiteralPath $evDest).Length
+        kind   = $evKind
+    }
+    if ($counts) { $evidenceObj.counts = [pscustomobject]$counts }
     $evidenceObj = [pscustomobject]$evidenceObj
 }
 

@@ -78,7 +78,7 @@ stdin/stdout adapters for Claude's contract, wired by `hooks/hooks.json` (declar
 
 | Intent | Claude event | Script |
 |---|---|---|
-| Hydrate profile + ticket state at session start | `SessionStart` | `session-context.js` |
+| Hydrate profile + ticket state at session start; also starts the daily scratch sweep in the background (once per UTC day, skip with `TMO_SKIP_SWEEP=1`) | `SessionStart` | `session-context.js` |
 | Deny user `plans/` files; ask for a ticket id on product commits | `PreToolUse` (`Bash|PowerShell`) | `git-guard.js` → `git-commit-ticket.js` |
 | Run `Assert-AgenticFlow` before pushing this folder, and `Assert-TicketArtifacts -Phase prepush` before pushing a product branch that names a ticket | `PreToolUse` (`Bash|PowerShell`) | `git-guard.js` → `git-push-agentic-flow.js` |
 | Block direct closeout-file reads | `PreToolUse` (`Read`) | `closeout-read-guard.js` |
