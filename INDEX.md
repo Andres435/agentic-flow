@@ -11,10 +11,12 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [CUSTOMIZE.md](CUSTOMIZE.md) | first clone; `/start-new-project` or `/adopt-project` | customize, profile, tracker, overlay, registry |
 | [MACHINE-SETUP.md](MACHINE-SETUP.md) | new laptop; bootstrap; IDE plugin install | setup, pwsh, hooks, Claude Code, Codex |
 | [TEMPLATE.md](TEMPLATE.md) | maintaining the host: core vs overlay | core, overlay, versioning, porting, agentic-flow |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | sending a change to the template; checks before a PR | contributing, pull request, license, core change |
 | [AGENTS.md](AGENTS.md) | agent routing, subagent functions, domain router | agents, routing, engineering mode |
 | [profile.json](profile.json) | repos, tracker, prefix, stack command, slash list | repos, ticketSystem, ticketPrefix, slashCommands, uiGlobs |
 | [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) | attribution for adapted ideas | notices, license |
 | [.github/SECURITY.md](.github/SECURITY.md) | how to report a vulnerability in private | security, vulnerability, report |
+| [.github/pull_request_template.md](.github/pull_request_template.md) | opening a PR here; the checklist it shows | pull request, checklist, template |
 
 ## Contracts (`_shared/`)
 

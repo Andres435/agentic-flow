@@ -42,7 +42,7 @@ copy in `%LOCALAPPDATA%` can be blocked by application control.
 
 ### Application allowlist
 
-If an application allowlist (for example ThreatLocker) guards the machine, keep the workspace
+If endpoint allowlisting (application control that only runs scripts from approved folders) guards the machine, keep the workspace
 clones and this template clone under the one allowed root, and never let agents write helper scripts
 to temp or a scratchpad: only scripts run from the allowed root. Each blocked run is an approval
 prompt for you. To have the `script-path-guard` hook deny those attempts before they reach the

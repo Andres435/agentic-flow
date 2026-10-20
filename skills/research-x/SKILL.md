@@ -14,7 +14,8 @@ do not add a bearer token, and do not add an MCP Twitter server.
 
 ## Handle
 
-Read [../../user/identity.json](../../user/identity.json) `xHandle` when that file exists. An empty
+Read `user/identity.json` `xHandle` when that file exists (copy
+[../../user/identity.example.json](../../user/identity.example.json); it is gitignored). An empty
 handle means search openly. Fill the handle once if the question is about the user's own posts.
 
 ## When

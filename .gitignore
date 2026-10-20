@@ -17,7 +17,6 @@ node_modules/
 plans/*
 !plans/README.md
 !plans/closeout-index.md
-!plans/workflow-template-plan.md
 !plans/examples/
 
 # Per-app ticket files on this host. Overlays stay tracked; the ledger does not.
@@ -37,3 +36,6 @@ tmp/
 user/external-lanes.local.json
 scripts/*.log
 testResults.xml
+
+# Personal identity (X handle for /research-x). Copy user/identity.example.json.
+user/identity.json

@@ -16,5 +16,5 @@ Opening a registered checkout loads this host plugin plus `apps/<id>`. Shared fi
 collaborator should see (`AGENTS.md`, `.cursor/rules`, CI notes) are written into the app
 after you confirm the draft.
 
-A product that is several related repos (the TMO layout) keeps its own workflow copy. Do not
+A product that is several related repos (the one-product layout) keeps its own workflow copy. Do not
 register those origins here.
