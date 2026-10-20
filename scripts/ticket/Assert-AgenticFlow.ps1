@@ -275,7 +275,7 @@ if (Test-Path -LiteralPath $epochScript) {
 # AGENTS.md tells every chat to grep INDEX.md first, so a doc with no row is a doc no
 # chat finds. Each tracked .md/.mdc must appear as a link target `](path` somewhere in
 # INDEX.md (grouped rows are fine). Exempt: per-ticket and example plans, fixtures,
-# scratch, user config, folder READMEs, INDEX itself, and the CLAUDE.md overlays.
+# eval case files (evals/README.md indexes them), scratch, user config, folder READMEs, INDEX itself, and the CLAUDE.md overlays.
 $indexPath = Join-Path $Root 'INDEX.md'
 if (Test-Path -LiteralPath $indexPath) {
     $idx = Get-Content -LiteralPath $indexPath -Raw -Encoding UTF8
@@ -286,7 +286,7 @@ if (Test-Path -LiteralPath $indexPath) {
             if ($pp.PSObject.Properties.Name -contains 'ticketPrefix' -and $pp.ticketPrefix) { $ticketPrefixForPlans = [string]$pp.ticketPrefix }
         } catch { }
     }
-    $indexExempt = @("plans/$ticketPrefixForPlans*", 'plans/examples/*', 'apps/*/plans/*', '*/fixtures/*', 'tmp/*', 'user/*', 'INDEX.md',
+    $indexExempt = @("plans/$ticketPrefixForPlans*", 'plans/examples/*', 'apps/*/plans/*', '*/fixtures/*', 'evals/*/*', 'tmp/*', 'user/*', 'INDEX.md',
         'CLAUDE.md', '*/CLAUDE.md', 'adapters/*/workspace-*', '*/README.md', '*/README.markdown', '*/_README.md')
     $tracked = @()
     Push-Location -LiteralPath $Root
