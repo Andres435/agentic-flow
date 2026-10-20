@@ -28,11 +28,11 @@ next to `ticket-intake-generic.md`. Do not ask for hours if the manifest has ses
 
 ## Instructions
 
-Read `.cursor/plans/WI<number>-manifest.json` (if present) and use its `affectedRepos` as the
+Read `.cursor/plans/<ticket>-manifest.json` (if present) and use its `affectedRepos` as the
 authoritative repo list. Resolve where to run `git` — do not assume either tree:
 
 ```powershell
-.\.cursor\scripts\ticket\Resolve-TicketRoot.ps1 -Ticket WI<number> -Json
+.\.cursor\scripts\ticket\Resolve-TicketRoot.ps1 -Ticket <ticket> -Json
 ```
 
 Run every `git` command in the `repos[].path` it returns (the canonical clone in `branch` mode, the
