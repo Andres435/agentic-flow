@@ -1,0 +1,8 @@
+Repository: app    Branch: TICKET-00009 (from main)    Staged, not committed:
+
+ M src/Billing/LateFeeService.cs              | 2 +-
+ A tests/Billing/LateFeeServiceTests.cs       | 41 +++++++++++
+
+LateFeeService.GetLateFee now returns 0 while invoice.DaysLate <= account.GraceDays (was <= 0).
+New tests: inside grace -> 0.00; one day past grace -> 5%; zero grace keeps the old behavior.
+Verify receipt: tests pass (4/4), static analysis not run. Review stamp: Ready.

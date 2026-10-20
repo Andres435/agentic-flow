@@ -80,6 +80,7 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [agents/script-engineer.md](agents/script-engineer.md) | creating or changing a .ps1/.py script | script, PowerShell, Pester, PSScriptAnalyzer |
 | [skills/workflow-change/SKILL.md](skills/workflow-change/SKILL.md) | changing this workflow repo itself: gate run, upstream decision, TD cleanup, plugin refresh | workflow change, maintainer, edit skill, add gate, plugin refresh |
 | [skills/script-authoring/SKILL.md](skills/script-authoring/SKILL.md) | before writing any script: where it may live, standards, tests | script, ps1, tmp, scratch, Requires, StrictMode, Pester |
+| [evals/README.md](evals/README.md) | agent-behavior evals: sample cases, grading, running only what a change affects | evals, claude plugin eval, Assert-EvalArtifacts, expect.json, EvalGraders, Select-EvalCases, refusal, pass@1, pass^3 |
 | [_shared/agentic-proof.md](_shared/agentic-proof.md) | the commit trailer that carries verify/review proof out of the local manifest; what may leave the machine; pipeline step | agentic proof, Agentic-Proof trailer, fingerprint, PR pipeline, server-side |
 | [skills/blast-radius/SKILL.md](skills/blast-radius/SKILL.md) | what a shared change could break | blast radius, shared module, public API |
 | [skills/tdd-red-green-refactor/SKILL.md](skills/tdd-red-green-refactor/SKILL.md) | test-first work | TDD, characterization |
