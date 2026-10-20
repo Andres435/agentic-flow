@@ -64,7 +64,11 @@ if (Test-Path -LiteralPath $profilePath) {
         $names = @($profileJson.repos | ForEach-Object {
             if ($_ -is [string]) { return $_ }
             $rel = [string]$_.path
-            if (-not $rel) { $rel = [string]$_.name }
+            $name = [string]$_.name
+            # Hosted single-repo overlays use path "." at the opened checkout.
+            # Product clones still live beside the workflow under repos[].name.
+            if ($rel -eq '.') { return '.' }
+            if ($name) { return $name }
             $rel
         } | Where-Object { $_ })
     }
