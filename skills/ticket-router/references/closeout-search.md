@@ -9,7 +9,7 @@ keywords: closeout search, priorFindings, ticket memory, closeout-index, lessons
 `plans/closeout-index.md` is the compounding knowledge store: one dense row per durable lesson, and
 the only surface worth searching. Search it, then keep at most **8** compact lessons on the manifest.
 
-Do **not** read `plans/WI*-closeout.md` files. Those exist only for the rare ticket whose
+Do **not** read `plans/<ticket>-closeout.md` files. Those exist only for the rare ticket whose
 retrospective earned a page ([task-retrospective.md](../../complete-task/references/task-retrospective.md)), and the lesson from any
 such ticket is already in the index.
 
@@ -34,7 +34,7 @@ the detail and the fallback. Re-run if scope changes (new repo or integration).
    Fallback when the script fails: `Grep` `plans/closeout-index.md` directly.
 3. Union, dedupe by ticket id, cap 8, and copy into manifest `priorFindings[]` (`ticket` + one-line `lesson`).
 4. Do **not** add closeout files to `docSet`. If a lesson needs detail and that ticket happens to
-   have a `WI<n>-closeout.md`, read **only** its **Other findings** slice.
+   have a `<ticket>-closeout.md`, read **only** its **Other findings** slice.
 
 ## Guardrails
 

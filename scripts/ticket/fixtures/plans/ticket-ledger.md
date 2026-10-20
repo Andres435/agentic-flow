@@ -3,7 +3,7 @@
 One row per closed ticket. Written by `scripts/ticket/Update-TicketLedger.ps1` at
 `/complete-task` -- do not hand-edit, the script owns this format.
 
-This replaces the per-ticket `WI<n>-closeout.md` files. Durable *lessons* live in
+This replaces the per-ticket `<ticket>-closeout.md` files. Durable *lessons* live in
 [closeout-index.md](../../../../plans/closeout-index.md); a full closeout page is written only when a
 retrospective earns one. Scorecard scale 1-5 (5 = excellent). `CtxS%` is the
 /start-ticket chat, `CtxR%` is `/review-changes`, `Ctx%` is `/complete-task`.

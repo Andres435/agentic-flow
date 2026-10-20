@@ -33,7 +33,7 @@ text, titles, paths, code, repo names, or manifest content.
 
 ## Write and verify
 
-- **Write** (prep-pr, before the commit, with the work staged): `Get-AgenticProof.ps1 -Ticket WI<n> -Repo <repo>`
+- **Write** (prep-pr, before the commit, with the work staged): `Get-AgenticProof.ps1 -Ticket <ticket> -Repo <repo>`
   prints the line. It refuses unless the verify receipt and review stamp both describe the staged work.
   Put the line in the commit message as the last trailer.
 - **Verify** (anywhere, one file, no repo dependencies): `Assert-AgenticProof.ps1 -RepoPath <repo> [-Commit <sha>]
