@@ -85,6 +85,21 @@ function Get-CursorRepoRoot {
     return $parent
 }
 
+# Folder of one profile repos[] entry, relative to the repos root, or $null to skip it. Same rule
+# as session-context.js profileRepoDir (shared cases in fixtures/profile-repo-dirs.json): path "."
+# is the opened checkout, otherwise clones live beside the workflow under their name.
+function Get-ProfileRepoDir {
+    param($Repo)
+    if ($null -eq $Repo) { return $null }
+    if ($Repo -is [string]) { if ($Repo) { return $Repo } else { return $null } }
+    $props = @($Repo.PSObject.Properties | ForEach-Object { $_.Name })   # StrictMode-safe for {}
+    $rel = if ($props -contains 'path' -and $Repo.path) { [string]$Repo.path } else { '' }
+    if ($rel -eq '.') { return '.' }
+    if ($props -contains 'name' -and $Repo.name) { return [string]$Repo.name }
+    if ($rel) { return $rel }
+    return $null
+}
+
 function Get-TicketManifestFile {
     param(
         [Parameter(Mandatory)][string]$RepoRoot,

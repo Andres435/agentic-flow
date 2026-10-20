@@ -323,5 +323,15 @@ test("branch fallback stays silent for a closed ticket, no manifest, or two open
   });
 });
 
+test("profileRepoDir matches the shared repo-folder cases (parity with Get-ProfileRepoDir)", () => {
+  const { profileRepoDir } = require("../core/session-context.js");
+  const fixture = path.join(__dirname, "..", "..", "scripts", "ticket", "fixtures", "profile-repo-dirs.json");
+  const { cases } = JSON.parse(fs.readFileSync(fixture, "utf8"));
+  assert.ok(cases.length > 0);
+  for (const c of cases) {
+    assert.strictEqual(profileRepoDir(c.repo), c.dir, JSON.stringify(c.repo));
+  }
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

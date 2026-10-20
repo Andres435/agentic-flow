@@ -64,6 +64,21 @@ function detectTicket(hints, profile) {
 }
 
 /**
+ * Folder of one profile repos[] entry, relative to the repos root, or null to skip it.
+ * Same rule as ManifestFields.ps1 Get-ProfileRepoDir (shared cases in
+ * scripts/ticket/fixtures/profile-repo-dirs.json): path "." is the opened checkout, otherwise
+ * clones live beside the workflow under their name, and path is only a fallback.
+ */
+function profileRepoDir(repo) {
+  if (typeof repo === "string") return repo || null;
+  if (!repo || typeof repo !== "object") return null;
+  const rel = repo.path ? String(repo.path) : "";
+  if (rel === ".") return ".";
+  if (repo.name) return String(repo.name);
+  return rel || null;
+}
+
+/**
  * Branch-mode fallback for a chat opened at the workspace root: read each profile repo's
  * current branch and keep the one ticket whose manifest is still open. Anything else
  * (no ticket branch, a closed ticket, two open tickets) returns null and the commands ask.
@@ -75,10 +90,9 @@ function detectTicketFromBranches(profile, reposRoot, plansDir) {
   const repos = Array.isArray(profile && profile.repos) ? profile.repos : [];
   const open = new Set();
   for (const repo of repos) {
-    const name = typeof repo === "string" ? repo : repo && repo.name;
-    const rel = typeof repo === "object" && repo && repo.path ? String(repo.path) : name;
-    if (!name && !rel) continue;
-    const repoPath = !rel || rel === "." ? reposRoot : path.join(reposRoot, rel);
+    const dir = profileRepoDir(repo);
+    if (!dir) continue;
+    const repoPath = dir === "." ? reposRoot : path.join(reposRoot, dir);
     if (!fs.existsSync(repoPath)) continue;
     let branch = "";
     try {
@@ -235,4 +249,4 @@ function buildPacket(hints) {
   return { label, compact, env, text };
 }
 
-module.exports = { buildPacket, detectTicket, detectTicketFromBranches, loadProfile, resolveNextAction };
+module.exports = { buildPacket, detectTicket, detectTicketFromBranches, loadProfile, profileRepoDir, resolveNextAction };
