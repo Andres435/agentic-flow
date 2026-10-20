@@ -2,9 +2,9 @@
 
 Two layouts:
 
-- **One product** (TMO-style). This clone sits next to related repos. `/start-new-project` fills
+- **One product** (several related repos). This clone sits next to them. `/start-new-project` fills
   the root `profile.json`, the status boxes below, and `environments/local-dev.md`.
-- **Many small GitHub apps.** Keep this host (`agentic-flow`) once. `/start-new-project` (blank
+- **Many small GitHub apps.** Keep this host once (any folder name; the docs say `agentic-flow`). `/start-new-project` (blank
   product) or `/adopt-project` (existing checkout) writes `apps/<id>/` and a row in
   `apps/registry.json` (local; shape in [registry.example.json](apps/registry.example.json)). Personal context stays here, out of git; `AGENTS.md` and shared
   rules go in the app.
@@ -36,6 +36,9 @@ Filled by `/start-new-project`. Leave this blank until that command runs.
 ---
 
 ## 1. Edit `profile.json` (required)
+
+> Only Claude Code has run the enforcement gates end to end. Cursor is untested against them and
+> the Codex adapter is experimental, so check the gates once in your IDE before relying on them.
 
 Open `profile.json` and fill in your project's values:
 
