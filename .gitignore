@@ -17,7 +17,6 @@ node_modules/
 plans/*
 !plans/README.md
 !plans/closeout-index.md
-!plans/workflow-template-plan.md
 !plans/examples/
 
 # Per-app overlays and the registry on this host. This repo is public and both name personal
@@ -40,3 +39,6 @@ tmp/
 user/external-lanes.local.json
 scripts/*.log
 testResults.xml
+
+# claude plugin eval run reports (pruned by scripts/Clear-WorkflowScratch.ps1).
+evals/results/

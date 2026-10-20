@@ -11,10 +11,12 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [CUSTOMIZE.md](CUSTOMIZE.md) | first clone; `/start-new-project` or `/adopt-project` | customize, profile, tracker, overlay, registry |
 | [MACHINE-SETUP.md](MACHINE-SETUP.md) | new laptop; bootstrap; IDE plugin install | setup, pwsh, hooks, Claude Code, Codex |
 | [TEMPLATE.md](TEMPLATE.md) | maintaining the host: core vs overlay | core, overlay, versioning, porting, agentic-flow |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | sending a change to the template; checks before a PR | contributing, pull request, license, core change |
 | [AGENTS.md](AGENTS.md) | agent routing, subagent functions, domain router | agents, routing, engineering mode |
 | [profile.json](profile.json) | repos, tracker, prefix, stack command, slash list | repos, ticketSystem, ticketPrefix, slashCommands, uiGlobs |
 | [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) | attribution for adapted ideas | notices, license |
 | [.github/SECURITY.md](.github/SECURITY.md) | how to report a vulnerability in private | security, vulnerability, report |
+| [.github/pull_request_template.md](.github/pull_request_template.md) | opening a PR here; the checklist it shows | pull request, checklist, template |
 
 ## Contracts (`_shared/`)
 
@@ -80,6 +82,7 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [agents/script-engineer.md](agents/script-engineer.md) | creating or changing a .ps1/.py script | script, PowerShell, Pester, PSScriptAnalyzer |
 | [skills/workflow-change/SKILL.md](skills/workflow-change/SKILL.md) | changing this workflow repo itself: gate run, upstream decision, TD cleanup, plugin refresh | workflow change, maintainer, edit skill, add gate, plugin refresh |
 | [skills/script-authoring/SKILL.md](skills/script-authoring/SKILL.md) | before writing any script: where it may live, standards, tests | script, ps1, tmp, scratch, Requires, StrictMode, Pester |
+| [evals/README.md](evals/README.md) | agent-behavior evals: sample cases, grading, running only what a change affects | evals, claude plugin eval, Assert-EvalArtifacts, expect.json, EvalGraders, Select-EvalCases, refusal, pass@1, pass^3 |
 | [_shared/agentic-proof.md](_shared/agentic-proof.md) | the commit trailer that carries verify/review proof out of the local manifest; what may leave the machine; pipeline step | agentic proof, Agentic-Proof trailer, fingerprint, PR pipeline, server-side |
 | [skills/blast-radius/SKILL.md](skills/blast-radius/SKILL.md) | what a shared change could break | blast radius, shared module, public API |
 | [skills/tdd-red-green-refactor/SKILL.md](skills/tdd-red-green-refactor/SKILL.md) | test-first work | TDD, characterization |
