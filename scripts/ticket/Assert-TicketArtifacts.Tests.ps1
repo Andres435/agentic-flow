@@ -442,6 +442,32 @@ Describe 'Assert-TicketArtifacts -Phase close: context percents' {
         }
     }
 
+    It 'resolves plans/evidence/ receipts against the workflow root: passes intact, fails altered, legacy tmp path still passes' {
+        $src = Join-Path $TestDrive 'evidence-src.log'
+        [System.IO.File]::WriteAllText($src, 'Passed! total 3')
+        $root = Join-Path $TestDrive 'close-evidence-folder'
+        New-StampedCloseRoot $root
+        & (Join-Path $PSScriptRoot 'Set-VerifyReceipt.ps1') -Ticket WI00009 -Repo app -Tests pass -Sonar ok -Evidence $src -Root $root
+        $copy = Join-Path $root 'plans/evidence/WI00009/app-verify.log'
+        Test-Path -LiteralPath $copy | Should -BeTrue
+        (Invoke-Assert -Root $root -Phase 'close').ExitCode | Should -Be 0
+        [System.IO.File]::WriteAllText($copy, 'Passed! total 4 (edited)')
+        $altered = Invoke-Assert -Root $root -Phase 'close'
+        $altered.ExitCode | Should -Be 1
+        $altered.Output | Should -Match 'evidence file changed'
+
+        # A legacy receipt that points into tmp/ keeps resolving as before.
+        $legacyFile = Join-Path $TestDrive 'legacy-tmp.log'
+        [System.IO.File]::WriteAllText($legacyFile, 'Passed! total 3')
+        $legacySha = (Get-FileHash -LiteralPath $legacyFile -Algorithm SHA256).Hash.ToLowerInvariant()
+        $legacyRoot = Join-Path $TestDrive 'close-evidence-legacy-tmp'
+        New-StampedCloseRoot $legacyRoot
+        Set-VerifyJson $legacyRoot ('{"repos":{"app":{"pass":true,"tests":"pass","sonar":"ok","evidenceVersion":1,"evidence":{"path":"' + ($legacyFile -replace '\\', '/') + '","sha256":"' + $legacySha + '","bytes":15,"kind":"log"}}}}')
+        (Invoke-Assert -Root $legacyRoot -Phase 'close').ExitCode | Should -Be 0
+        [System.IO.File]::WriteAllText($legacyFile, 'edited')
+        (Invoke-Assert -Root $legacyRoot -Phase 'close').ExitCode | Should -Be 1
+    }
+
     It 'fails a bug close with no verify results on the manifest' {
         $root = Join-Path $TestDrive 'close-no-verify'
         New-CloseRoot -Root $root -WorkType 'bug' -Ctx @{ start = 40; review = 50; close = 60 }

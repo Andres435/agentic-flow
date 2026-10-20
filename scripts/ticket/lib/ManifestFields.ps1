@@ -137,16 +137,35 @@ function Get-GitDiffText {
         [Parameter(Mandatory)][string[]]$GitArgs
     )
     if (-not (Test-Path -LiteralPath $RepoPath)) { return $null }
-    $prev = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
+    # Run git through System.Diagnostics.Process and decode stdout as UTF-8 ourselves. Native
+    # command output is decoded with [Console]::OutputEncoding, which is the OEM code page when
+    # pwsh is spawned by Node or Git Bash; a non-ASCII byte would then change the fingerprint.
+    # ReadLine splits on \r\n, \n and a lone \r, as PowerShell does for native output.
+    $psi = [Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = 'git'
+    $psi.ArgumentList.Add('-C')
+    $psi.ArgumentList.Add($RepoPath)
+    foreach ($a in $GitArgs) { $psi.ArgumentList.Add([string]$a) }
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
+    $psi.CreateNoWindow = $true
+    $psi.WorkingDirectory = (Get-Location).ProviderPath   # a relative RepoPath resolves like it did for & git
+    $proc = [Diagnostics.Process]::new()
+    $proc.StartInfo = $psi
     try {
-        $raw = & git -C $RepoPath @GitArgs 2>$null
-        if ($LASTEXITCODE -ne 0) { return $null }
-        if ($null -eq $raw) { return '' }
-        if ($raw -is [array]) { return ($raw -join "`n") }
-        return [string]$raw
+        try { [void]$proc.Start() } catch { return $null }   # git missing or not startable: same "git failed" result as before
+        $errTask = $proc.StandardError.ReadToEndAsync()
+        $lines = [System.Collections.Generic.List[string]]::new()
+        while ($null -ne ($line = $proc.StandardOutput.ReadLine())) { $lines.Add($line) }
+        $proc.WaitForExit()
+        [void]$errTask.Wait()
+        if ($proc.ExitCode -ne 0) { return $null }
+        if ($lines.Count -eq 0) { return '' }
+        return ($lines -join "`n")
     } finally {
-        $ErrorActionPreference = $prev
+        $proc.Dispose()
     }
 }
 

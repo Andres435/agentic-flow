@@ -27,6 +27,7 @@ node hooks/tests/context-usage.test.js
 | `script-path-guard.test.js` | `core/script-path-guard.js`, both adapters | Deny writing or running .ps1/.py outside the allowed script root (opt-in: set `AGENTIC_SCRIPT_ALLOW_ROOT`); allow repo, relative and inert commands |
 | `commit-guard.test.js` | `core/commit-guard.js`, `git-hooks/pre-commit` | Deny user-local plans/ files; ask for a ticket id only in product repos, read from the message (`-m`, `-F`, `-F -`), not the directory |
 | `secret-scan.test.js` | `core/secret-scan.js`, `core/commit-guard.js`, `git-hooks/pre-commit` | Deny a commit that adds a token-shaped secret (patterns in `scripts/ticket/secret-patterns.json`); never echo the token; `secret-scan:allow` exempts a line |
+| `session-sweep.test.js` | `core/session-context.js` `maybeSweep`, `core/pwsh.js` | Once-per-UTC-day detached `Clear-WorkflowScratch.ps1`; `TMO_SKIP_SWEEP=1` skips; a failing spawn never throws; packet output unchanged |
 | `hooks-manifest.test.js` | root `hooks.json` (Cursor) | Every matcher compiles with no control character (a JSON `` is a backspace) and fires on the commands its hook guards |
 | `context-usage.test.js` | `core/context-usage.js`, Claude Stop hook | Measured context from a transcript; per-session record |
 

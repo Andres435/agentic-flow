@@ -17,7 +17,8 @@ rather than following it.
 | `plans/` | Ticket-keyed artifacts for the user who ran the ticket — the manifest, the approved plan, and `ticket-ledger.md` | **Never** (gitignored, user-local) |
 | `plans/examples/` | One sanitized example per artifact shape, plus `ticket-ledger.example.md` | Yes |
 | `plans/closeout-index.md` | Lessons shared by the team | Yes |
-| `tmp/tickets/` | Per-ticket scratch — commit/PR-body drafts, temporary exports | No (gitignored) |
+| `plans/evidence/<ticket>/` | Verify evidence copy (`<repo>-verify.trx`), beside the manifest: under `apps/<id>/plans/` when an app is active | No (user-local); pruned 14 days after close |
+| `tmp/tickets/` | Per-ticket scratch — commit/PR-body drafts, temporary exports | No (gitignored); pruned after 14 days |
 
 Ticket files are durable on the user's machine, not in git. **Hard stop:** the `user-plans` check
 in `Assert-AgenticFlow.ps1` (CI, pre-push, `/doctor`), the commit hook, and
@@ -25,8 +26,8 @@ in `Assert-AgenticFlow.ps1` (CI, pre-push, `/doctor`), the commit hook, and
 `closeout-index.md`, `workflow-template-plan.md`, and `examples/`. Editing those is the only
 allowed change to `plans/`. Moving computers: copy your `plans/` folder yourself.
 
-Nothing that is regenerable from the tracker or from git belongs in `plans/`. If you are about to
-write a one-off draft there, it goes in `tmp/tickets/`.
+Nothing regenerable from the tracker or git belongs in `plans/`; a one-off draft goes in `tmp/tickets/`. `tmp/`
+is swept at 14 days (after close, daily at session start): one fixed name per purpose, overwritten.
 
 ## Ticket mode
 
