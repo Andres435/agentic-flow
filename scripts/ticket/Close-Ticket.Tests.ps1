@@ -16,6 +16,10 @@ BeforeAll {
     $script:PwshHost = (Get-Command pwsh).Source
     $script:Utf8 = New-Object System.Text.UTF8Encoding($false)
     $env:TMO_CTX_USAGE_FILE = Join-Path $TestDrive 'no-ctx-usage.json'
+    # The close-time sweep also looks in TEMP; point it at an empty folder so a test never touches the real one.
+    $script:RealTemp = $env:TEMP
+    $env:TEMP = Join-Path $TestDrive 'empty-temp'
+    New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
 
     function New-ClosableRoot {
         param([string]$Name, [switch]$NoVerify)
@@ -61,7 +65,10 @@ BeforeAll {
     }
 }
 
-AfterAll { Remove-Item Env:TMO_CTX_USAGE_FILE -ErrorAction SilentlyContinue }
+AfterAll {
+    Remove-Item Env:TMO_CTX_USAGE_FILE -ErrorAction SilentlyContinue
+    $env:TEMP = $script:RealTemp
+}
 
 Describe 'Close-Ticket' {
     It 'closes a closable ticket: timestamp, ledger row, close gate' {
@@ -119,6 +126,39 @@ Describe 'Close-Ticket' {
         $r = Invoke-Close -Root $root
         $r.ExitCode | Should -Be 1
         $r.Output | Should -Match '\[FAIL\] close step 1 \(resolve\): no manifest'
+    }
+
+    It 'runs the scratch sweep after a passing close (and not as a numbered step)' {
+        $root = New-ClosableRoot 'sweep-ok'
+        $old = Join-Path $root 'tmp/old-scratch.txt'
+        New-Item -ItemType Directory -Path (Split-Path $old -Parent) -Force | Out-Null
+        [System.IO.File]::WriteAllText($old, 'x')
+        (Get-Item -LiteralPath $old).LastWriteTime = (Get-Date).AddDays(-30)
+        $r = Invoke-Close -Root $root
+        $r.ExitCode | Should -Be 0
+        Test-Path -LiteralPath $old | Should -BeFalse
+        $r.Output | Should -Not -Match 'close step 7'
+        $r.Output | Should -Match '\[OK\] close step 5'
+    }
+
+    It 'does not run the sweep when the close fails' {
+        $root = New-ClosableRoot 'sweep-fail' -NoVerify
+        $old = Join-Path $root 'tmp/old-scratch.txt'
+        New-Item -ItemType Directory -Path (Split-Path $old -Parent) -Force | Out-Null
+        [System.IO.File]::WriteAllText($old, 'x')
+        (Get-Item -LiteralPath $old).LastWriteTime = (Get-Date).AddDays(-30)
+        $r = Invoke-Close -Root $root
+        $r.ExitCode | Should -Be 1
+        Test-Path -LiteralPath $old | Should -BeTrue
+    }
+
+    It 'a throwing sweep does not change the close result' {
+        $root = New-ClosableRoot 'sweep-throws'
+        $boom = Join-Path $PSScriptRoot 'fixtures/Throwing-Sweep.ps1'
+        $r = Invoke-Close -Root $root -Extra @('-SweepScript', $boom)
+        $r.ExitCode | Should -Be 0
+        $r.Output | Should -Match '\[PASS] TICKET-9 closed'
+        $r.Output | Should -Not -Match 'sweep exploded'
     }
 
     It '-WhatIf lists the steps and writes nothing' {

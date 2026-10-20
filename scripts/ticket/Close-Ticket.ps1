@@ -40,6 +40,10 @@
 .PARAMETER Root
     Override the workflow repo root (tests). Also puts the close gate in fixture mode.
 
+.PARAMETER SweepScript
+    Test seam: path of the scratch-sweep script to run after a passing close; default is
+    scripts/Clear-WorkflowScratch.ps1 beside this folder.
+
 .EXAMPLE
     .\scripts\ticket\Close-Ticket.ps1 -Ticket TICKET-42 -Efficiency 4 -Contextualization 4 -CostTokens 3 -Pr 1234
 #>
@@ -51,7 +55,8 @@ param(
     [Parameter(Mandatory)][ValidateRange(1, 5)][int]$Contextualization,
     [Parameter(Mandatory)][ValidateRange(1, 5)][int]$CostTokens,
     [string]$Pr,
-    [string]$Root
+    [string]$Root,
+    [string]$SweepScript
 )
 
 Set-StrictMode -Version Latest
@@ -174,5 +179,16 @@ Write-Output "[OK] close step 5 (ledger): row written for $Key"
 $null = Invoke-CloseScript -N 6 -Script 'Assert-TicketArtifacts.ps1' `
     -Splat (@{ Ticket = $Key; Phase = 'close' } + $rootArgs) `
     -Fix 'the close gate still fails; fix what is listed (a stale receipt or review goes back to /complete-task step 1 or 2) and re-run'
+
+# ---- tidy (not a numbered step): prune old scratch once the ticket has closed ---------
+# Best effort: a failing sweep never changes the close result. -SweepScript is a test seam.
+try {
+    $sweepScript = if ($SweepScript) { $SweepScript } else { Join-Path (Split-Path $PSScriptRoot -Parent) 'Clear-WorkflowScratch.ps1' }
+    $sweepArgs = @{ Quiet = $true }
+    if ($Root) { $sweepArgs.Root = $Root }
+    $sweepOut = (& $sweepScript @sweepArgs *>&1 | Out-String).Trim()
+    if ($sweepOut) { Write-Output $sweepOut }
+}
+catch { Write-Verbose "scratch sweep skipped: $($_.Exception.Message)" }
 Write-Output "[PASS] $Key closed: $($hours.ToString([cultureinfo]::InvariantCulture)) h, points $(if ($points) { $points } else { 'none' }), ledger row written, close gate passed."
 exit 0

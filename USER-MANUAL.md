@@ -151,6 +151,9 @@ you whether it passed and stamps Tested only if you approve. Review and closeout
 Tested / Untested latest changes. When an affected repo has profile layer `frontend` and the change
 touches a `uiGlobs` file type, close fails until that pass is Tested; otherwise you can skip it.
 
+Verify evidence is kept per ticket in `plans/evidence/<ticket>/` (user-local, not committed; under
+`apps/<id>/plans/` for an app). Scratch in `tmp/` older than 14 days is cleaned automatically, at session start and after close.
+
 ## Staging and review
 
 The staged set is the approval record. Stage hunks yourself, then `/review-changes` or

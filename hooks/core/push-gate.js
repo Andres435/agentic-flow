@@ -23,15 +23,9 @@ function pushDirs(command, cwd) {
   return gitCalls(command, cwd, "push").map((call) => call.dir);
 }
 
-// PowerShell 7 only. The gate scripts carry #Requires -Version 7, so Windows PowerShell 5.1
-// would refuse them and turn every push into a confusing deny.
-function findPowerShell() {
-  const r = spawnSync("pwsh", ["-NoProfile", "-NonInteractive", "-Command", "exit 0"], {
-    timeout: 8000,
-    encoding: "utf8",
-  });
-  return !r.error && r.status === 0 ? "pwsh" : null;
-}
+// PowerShell 7 only (see pwsh.js): Windows PowerShell 5.1 would refuse the #Requires -Version 7
+// gate scripts and turn every push into a confusing deny.
+const { findPowerShell } = require("./pwsh.js");
 
 const NO_PWSH = "PowerShell 7 (pwsh) is not on PATH, so this check was skipped. Install it (MACHINE-SETUP.md); CI still runs the repo gate.";
 

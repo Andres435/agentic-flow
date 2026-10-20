@@ -679,6 +679,7 @@ function Test-VerifyReceipt {
             $evFull = $null
             if ($evPath) {
                 if ([System.IO.Path]::IsPathRooted($evPath)) { $evFull = $evPath }
+                elseif ($evPath -match '^plans[/\\]evidence[/\\]') { $evFull = Join-Path (Split-Path $PlansDir -Parent) $evPath }   # beside the manifest: host root, or apps/<id> when an app is active
                 elseif ($hasCheckout) { $evFull = Join-Path $path $evPath }
             }
             if ($evFull -and (Test-Path -LiteralPath $evFull -PathType Leaf)) {

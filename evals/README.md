@@ -39,8 +39,9 @@ claude plugin eval . --eval-dir evals --trust-plugin --ablation none --allow-too
 `--scaffold` runs each case's own `scaffold.sh` (bash, as you); pass it only for your own cases.
 On Windows, put Git bash ahead of the WindowsApps `bash.exe` stub (`C:\Program Files\Git\bin` first
 on `PATH`): the stub strips the backslashes from the scaffold path and seeded cases score 0.
-`--case <name>` runs one case. `--keep-temp` leaves each run's workspace in `%TEMP%\claude-eval-*`;
-delete those afterward.
+`--case <name>` runs one case. `--keep-temp` leaves each run's workspace in `%TEMP%\claude-eval-*`.
+`scripts/Clear-WorkflowScratch.ps1` prunes those folders older than 14 days and `evals/results/` runs beyond the
+newest 5; delete them yourself only to free space sooner.
 
 ### Run only what a change affects
 

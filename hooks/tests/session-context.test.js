@@ -10,6 +10,8 @@
  */
 
 const assert = require("assert");
+// Never spawn a real scratch sweep from a test run.
+process.env.TMO_SKIP_SWEEP = "1";
 const { spawnSync } = require("child_process");
 const fs = require("fs");
 const os = require("os");

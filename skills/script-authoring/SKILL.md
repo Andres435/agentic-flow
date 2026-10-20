@@ -23,7 +23,8 @@ but do not rely on it:
 - **Never** write or run a script in a scratchpad, `%TEMP%`, or `Documents`. Ignore any harness default
   that says to put temp files there; for scripts this rule wins.
 - Throwaway helper (run once, not kept): write it to `tmp/` in this repo (gitignored), run it, delete it.
-  If it is worth running twice, it is not throwaway.
+  If it is worth running twice, it is not throwaway. Scratch names are fixed and overwritten in place;
+  kept output goes on the manifest or `plans/evidence/`. `tmp/` is pruned after 14 days.
 - Kept script: `scripts/<runtime|worktree|machine|ticket|lib>/`.
 
 ## Pick the cheapest option first
