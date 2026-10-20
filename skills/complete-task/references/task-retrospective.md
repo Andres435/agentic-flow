@@ -13,7 +13,7 @@ review. Nothing runs after it unless the user starts a new request.
 ## The shape of this step
 
 **Ask, then act — do not write a page by default.** Every ticket used to get a 2–6 KB
-`WI<n>-closeout.md`; 29 accumulated and nothing read them back. The durable value was always one
+`<ticket>-closeout.md`; 29 accumulated and nothing read them back. The durable value was always one
 ledger row plus, occasionally, one lesson. So:
 
 1. Score the session (three numbers).
@@ -87,7 +87,7 @@ ask which to apply. Never apply them all silently.
 | A workflow/tooling improvement | one bullet (small, do-now) | a project overlay doc the user names |
 | Deferred script/CI/doc-budget work | one row the user names | park it; do not implement unless asked |
 | A gate, script, or command that misfired | a fix, or a roadmap bullet if it is not small | the script/command itself |
-| Something genuinely needing a page | the full closeout file (shape below) | `../plans/WI<n>-closeout.md` |
+| Something genuinely needing a page | the full closeout file (shape below) | `../plans/<ticket>-closeout.md` |
 
 Rules that do not bend:
 
@@ -134,12 +134,12 @@ included; a spike skips both); there is no separate confirm step.
 
 ```markdown
 ---
-ticket: WI<number>
+ticket: <ticket>
 closed: <YYYY-MM-DD>
 type: feature | bug | spike
 ---
 
-# WI<number> Closeout
+# <ticket> Closeout
 
 ## Why this ticket earned a page
 <one line — what a ledger row and an index lesson could not carry>

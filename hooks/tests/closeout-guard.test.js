@@ -53,6 +53,16 @@ test("denies plans/WI99999-closeout.md (path key)", () => {
   assert.strictEqual(out.permission, "deny");
 });
 
+test("denies a closeout under the template prefix (TICKET-42)", () => {
+  const out = runHook({ file_path: "plans/TICKET-42-closeout.md" });
+  assert.strictEqual(out.permission, "deny");
+});
+
+test("allows a non-ticket file that ends in closeout.md", () => {
+  const out = runHook({ file_path: "skills/complete-task/closeout.md" });
+  assert.strictEqual(out.permission, "allow");
+});
+
 test("denies plans/closeout-index.md", () => {
   const out = runHook({ file_path: "plans/closeout-index.md" });
   assert.strictEqual(out.permission, "deny");

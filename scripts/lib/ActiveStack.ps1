@@ -153,7 +153,7 @@ function Get-ActiveTicketId {
 <#
 .SYNOPSIS
     Stops a Start-* launcher when a different ticket owns the app stack,
-    unless -Force is set. Uses -TicketHint when provided, otherwise reads WI<n>
+    unless -Force is set. Uses -TicketHint when provided, otherwise reads <ticket>
     from env TMO_ACTIVE_TICKET (set by agents/scripts running inside a ticket
     worktree). When the hint matches the current owner, the start is allowed.
 #>

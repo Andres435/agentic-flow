@@ -183,3 +183,27 @@ Describe 'Update-TicketLedger objective outcome columns' {
         (Get-LedgerText -Root $root) | Should -Match '\| 0 \| 1\.3 \|'
     }
 }
+
+Describe 'Update-TicketLedger -SeedFromCloseouts' {
+    It 'seeds from closeouts named with the profile ticketPrefix' {
+        $root = Join-Path $TestDrive 'seed-root'
+        $plans = Join-Path $root 'plans'
+        New-Item -ItemType Directory -Path $plans -Force | Out-Null
+        $closeout = @(
+            '---'
+            'ticket: TICKET-00042'
+            'closed: 2026-10-05'
+            'type: bug'
+            '---'
+            ''
+            '# TICKET-00042 Closeout'
+        ) -join "`n"
+        [System.IO.File]::WriteAllText((Join-Path $plans 'TICKET-00042-closeout.md'), $closeout + "`n", (New-Object System.Text.UTF8Encoding $false))
+
+        & $script:PwshHost -NonInteractive -NoProfile -File $script:LedgerScript -SeedFromCloseouts -Root $root
+        $LASTEXITCODE | Should -Be 0
+
+        $text = Get-Content -LiteralPath (Join-Path $plans 'ticket-ledger.md') -Raw -Encoding UTF8
+        $text | Should -Match '(?m)^\|\s*TICKET-00042\s*\|\s*bug\s*\|\s*2026-10-05\s*\|'
+    }
+}

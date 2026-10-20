@@ -5,20 +5,20 @@
     summary block.
 
 .DESCRIPTION
-    The ledger replaces per-ticket plans/WI<n>-closeout.md files. Those were
+    The ledger replaces per-ticket plans/<ticket>-closeout.md files. Those were
     2-6 KB each, 29 of them, and nothing read them back except the old
     Update-ScorecardTrend.ps1 -- the durable value was always the one-line
     scorecard plus the lesson row in plans/closeout-index.md.
 
     /complete-task calls this script instead of hand-writing a markdown table, so
-    the row format cannot drift. A full WI<n>-closeout.md is written only when a
+    the row format cannot drift. A full <ticket>-closeout.md is written only when a
     retrospective actually earns a page (see skills/complete-task/references/task-retrospective.md).
 
     Re-running for the same ticket REPLACES that ticket's row, so a reopen/reclose
     updates in place rather than duplicating.
 
 .PARAMETER Ticket
-    Work item, with or without the WI prefix.
+    Work item, with or without the profile ticketPrefix.
 
 .PARAMETER Type
     bug | feature | spike | refactor.
@@ -75,7 +75,7 @@
     the header), which clears the re-rate prompt from /doctor and the retrospective.
 
 .PARAMETER SeedFromCloseouts
-    One-time migration: build the ledger from every existing WI*-closeout.md
+    One-time migration: build the ledger from every existing <ticket>-closeout.md
     (front matter + scorecard) instead of from the parameters above. Additive:
     it replaces rows for tickets it finds and leaves every other row alone, so it
     can never destroy a row whose closeout file is gone.
@@ -366,10 +366,11 @@ if ($SeedFromCloseouts) {
     }
 
     $seeded = 0
-    foreach ($file in (Get-ChildItem -Path $PlansDir -Filter 'WI*-closeout.md' -ErrorAction SilentlyContinue)) {
+    $seedPrefix = [regex]::Escape($TICKET_PREFIX)
+    foreach ($file in (Get-ChildItem -Path $PlansDir -Filter "$TICKET_PREFIX*-closeout.md" -ErrorAction SilentlyContinue)) {
         $text = Get-Content -LiteralPath $file.FullName -Raw
-        $key = if ($text -match '(?m)^ticket:\s*(WI\d+)') { $Matches[1] }
-               elseif ($file.BaseName -match '^(WI\d+)') { $Matches[1] }
+        $key = if ($text -match "(?m)^ticket:\s*($seedPrefix\d+)") { $Matches[1] }
+               elseif ($file.BaseName -match "^($seedPrefix\d+)") { $Matches[1] }
                else { continue }
         $cl = ''
         if ($text -match '(?m)^closed:\s*(\d{4}-\d{2}-\d{2})') { $cl = $Matches[1] }
@@ -388,7 +389,7 @@ if ($SeedFromCloseouts) {
             -Hours '' -Pts '' -E $e -C $c -Tok $k -CtxS '' -CtxR '' -Ctx '' -Pr '' -Lanes '' -Epoch ''))
         $seeded++
     }
-    Write-Host "Seeded $seeded row(s) from WI*-closeout.md." -ForegroundColor Cyan
+    Write-Host "Seeded $seeded row(s) from <ticket>-closeout.md." -ForegroundColor Cyan
 }
 elseif ($Regenerate) {
     $filled = 0
@@ -497,7 +498,7 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('One row per closed ticket. Written by `scripts/ticket/Update-TicketLedger.ps1` at')
 [void]$sb.AppendLine('`/complete-task` -- do not hand-edit, the script owns this format.')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('This replaces the per-ticket `WI<n>-closeout.md` files. Durable *lessons* live in')
+[void]$sb.AppendLine('This replaces the per-ticket `<ticket>-closeout.md` files. Durable *lessons* live in')
 [void]$sb.AppendLine('[closeout-index.md](closeout-index.md); a full closeout page is written only when a')
 [void]$sb.AppendLine('retrospective earns one. Scorecard scale 1-5 (5 = excellent). `CtxS%` is the')
 [void]$sb.AppendLine('/start-ticket chat, `CtxR%` is `/review-changes`, `Ctx%` is `/complete-task`.')
