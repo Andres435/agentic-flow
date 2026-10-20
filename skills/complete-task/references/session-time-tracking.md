@@ -14,7 +14,7 @@ Do not ask the user for hours unless the timestamps are missing or the calculati
 
 ## Where the timestamps live
 
-**On the manifest:** `.cursor/plans/WI<number>-manifest.json`.
+**On the manifest:** `.cursor/plans/<ticket>-manifest.json`.
 
 **Written by:** [../../ticket-router/SKILL.md](../../ticket-router/SKILL.md) during
 [/start-ticket](../../start-ticket/SKILL.md), immediately after ADO intake — before branch setup or
@@ -23,7 +23,7 @@ any provisioning, so a late write cannot lose the session clock.
 **Updated by:** [/complete-task](../SKILL.md) at closeout.
 
 **Legacy fallback:** tickets started before the timestamps moved onto the manifest still have a
-`.cursor/plans/WI<number>-session.json`. Read it when the manifest has no timestamp fields, and write
+`.cursor/plans/<ticket>-session.json`. Read it when the manifest has no timestamp fields, and write
 the close back to it. Nothing creates that file any more.
 
 ### Fields (on the manifest)
@@ -167,7 +167,7 @@ Daily breakdown:
 
 ### Missing Timestamps
 
-If neither `WI<number>-manifest.json` nor the legacy `WI<number>-session.json` has a `startedAtUtc`:
+If neither `<ticket>-manifest.json` nor the legacy `<ticket>-session.json` has a `startedAtUtc`:
 
 - Report that automatic time tracking is unavailable.
 - Do not invent hours.

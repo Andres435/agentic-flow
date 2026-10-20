@@ -2,29 +2,29 @@
 <#
 .SYNOPSIS
     Resolves whether a ticket runs in branch mode (canonical clones) or worktree
-    mode (source\worktrees\WI<n>), and returns the per-repo paths to work in.
+    mode (source\worktrees\<ticket>), and returns the per-repo paths to work in.
 
 .DESCRIPTION
     /start-ticket defaults to BRANCH mode: branches in the canonical clones under
     source\repos. Worktree mode (--worktree) mirrors the repos under
-    source\worktrees\WI<n> and is the special case.
+    source\worktrees\<ticket> and is the special case.
 
     Every later command needs the same answer -- prep-pr, review-changes,
     complete-task, address-pr-comments, and the review/verify subagents all used
-    to hardcode source\worktrees\WI<n>\<repo> with an improvised canonical
+    to hardcode source\worktrees\<ticket>\<repo> with an improvised canonical
     fallback. This script is the single answer so they stop guessing.
 
     Mode precedence:
       1. manifest "mode"  -- what /start-ticket actually decided (source: manifest)
       2. branch           -- the default (source: default)
 
-    A leftover populated source\worktrees\WI<n> folder does NOT flip the default
+    A leftover populated source\worktrees\<ticket> folder does NOT flip the default
     to worktree. Only an explicit manifest mode of worktree uses that tree.
     When the manifest says worktree but the folder is gone, rootExists is false
     and callers stop rather than working in the canonical clones.
 
 .PARAMETER Ticket
-    Work item, with or without the WI prefix (TICKET-42, 42, AB#42).
+    Work item, with or without the profile ticketPrefix (TICKET-42, 42, AB#42).
 
 .PARAMETER Json
     Emit the resolution object as JSON instead of human-readable lines.
