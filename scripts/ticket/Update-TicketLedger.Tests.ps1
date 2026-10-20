@@ -42,7 +42,7 @@ Describe 'Update-TicketLedger column migration' {
         $hdr | Should -Match 'CtxS%'
         $row = ($text -split "`n" | Where-Object { $_ -match '^\|\s*WI00001' } | Select-Object -First 1)
         $cells = @(($row.Trim() -replace '^\|', '' -replace '\|$', '') -split '\|' | ForEach-Object { $_.Trim() })
-        $cells.Count | Should -Be 18
+        $cells.Count | Should -Be 19
         ($cells[14..17] -join '|') | Should -Be '|||'
         $cells[9] | Should -Be ''
         $cells[10] | Should -Be ''
@@ -128,7 +128,7 @@ Describe 'Update-TicketLedger objective outcome columns' {
         $root = New-OutcomeRoot -Name 'plain' -Manifests @{ 'TICKET-00011' = $m }
         Invoke-Ledger @('-Root', $root, '-Ticket', 'TICKET-00011', '-Type', 'bug', '-Mode', 'branch')
         $c = Get-LedgerCells -Root $root -Ticket 'TICKET-00011'
-        $c.Count | Should -Be 18
+        $c.Count | Should -Be 19
         ($c[15..17] -join '|') | Should -Be 'no|1.5|'
     }
 
@@ -161,7 +161,7 @@ Describe 'Update-TicketLedger objective outcome columns' {
         Invoke-Ledger @('-Root', $root, '-Rewrite')
         (Get-LedgerText -Root $root) | Should -Match '\| Epoch \| Reopened \| Days \| PRFind \|'
         $c = Get-LedgerCells -Root $root -Ticket 'WI00020'
-        $c.Count | Should -Be 18
+        $c.Count | Should -Be 19
         ($c[0..14] -join '|') | Should -Be 'WI00020|bug|2026-10-02|branch|6.2|3|3|4|4|62||30|14713|f1/s0/d0|abc12345'
         ($c[15..17] -join '|') | Should -Be '||'
     }
@@ -205,5 +205,24 @@ Describe 'Update-TicketLedger -SeedFromCloseouts' {
 
         $text = Get-Content -LiteralPath (Join-Path $plans 'ticket-ledger.md') -Raw -Encoding UTF8
         $text | Should -Match '(?m)^\|\s*TICKET-00042\s*\|\s*bug\s*\|\s*2026-10-05\s*\|'
+    }
+}
+
+Describe 'Update-TicketLedger Outcome column' {
+    BeforeAll { $script:Led = Join-Path $PSScriptRoot 'Update-TicketLedger.ps1' }
+
+    It 'records a parked row with an Outcome and no scorecard, and a later close replaces it' {
+        $root = Join-Path $TestDrive 'outcome'
+        New-Item -ItemType Directory -Path (Join-Path $root 'plans') -Force | Out-Null
+        & $script:Led -Ticket TICKET-00031 -Type bug -Mode branch -Hours 2.5 -Outcome more-info -Root $root *> $null
+        $row = @(Get-Content (Join-Path $root 'plans/ticket-ledger.md') | Where-Object { $_ -match '^\|\s*TICKET-00031' })
+        $row.Count | Should -Be 1
+        $cells = @(($row[0].Trim() -replace '^\|', '' -replace '\|$', '') -split '\|' | ForEach-Object { $_.Trim() })
+        $cells[18] | Should -Be 'more-info'
+        $cells[6] | Should -BeNullOrEmpty
+        & $script:Led -Ticket TICKET-00031 -Type bug -Mode branch -Hours 4 -Efficiency 4 -Contextualization 4 -CostTokens 3 -Root $root *> $null
+        $row = @(Get-Content (Join-Path $root 'plans/ticket-ledger.md') | Where-Object { $_ -match '^\|\s*TICKET-00031' })
+        $row.Count | Should -Be 1
+        @(($row[0].Trim() -replace '^\|', '' -replace '\|$', '') -split '\|' | ForEach-Object { $_.Trim() })[18] | Should -BeNullOrEmpty
     }
 }

@@ -109,6 +109,9 @@ if ($workType -notin @('bug', 'feature', 'spike', 'refactor')) {
     Stop-Close -N 1 -Fix "manifest workType '$workType' is not bug|feature|spike|refactor; fix it, then re-run" -Detail ''
 }
 $mode = [string](Get-Field $manifest 'mode')
+if (Get-Field $manifest 'parkedAtUtc') {
+    Stop-Close -N 1 -Fix "$Key is parked ($(Get-Field $manifest 'parkedState')); run Resume-Ticket.ps1 (or /start-ticket) before closing, so the idle gap is excluded" -Detail ''
+}
 $null = Invoke-CloseScript -N 1 -Script 'Assert-TicketArtifacts.ps1' `
     -Splat (@{ Ticket = $Key; Phase = 'prepush' } + $rootArgs) `
     -Fix 'the work checks of close fail (verify receipt, review stamp, Drive); fix what is listed and re-run. Nothing was written'
@@ -142,6 +145,20 @@ try {
     }
 }
 catch { Stop-Close -N 2 -Fix 'could not write the close timestamp to the manifest' -Detail $_.Exception.Message }
+
+# A resumed ticket (Resume-Ticket.ps1) has an open resume span: end it at this close so the
+# hours sum every span and nothing runs on past the close.
+try {
+    $manifest = Read-Manifest
+    $spanList = @(Get-Field $manifest 'spans')
+    $openSpans = @($spanList | Where-Object { $_ -and (Get-Field $_ 'startedAtUtc') -and -not (Get-Field $_ 'endedAtUtc') })
+    if ($openSpans.Count -gt 0) {
+        foreach ($sp in $openSpans) { $sp.endedAtUtc = $now }
+        Merge-TicketManifestFields -ManifestPath $manifestPath -Patch @{ spans = $spanList }
+        Write-Output "[OK] close step 2 (timestamp): $($openSpans.Count) open span(s) ended at $now"
+    }
+}
+catch { Stop-Close -N 2 -Fix 'could not close the open span on the manifest' -Detail $_.Exception.Message }
 
 # ---- 3 hours ------------------------------------------------------------------
 $hoursOut = Invoke-CloseScript -N 3 -Script 'Get-SessionHours.ps1' `

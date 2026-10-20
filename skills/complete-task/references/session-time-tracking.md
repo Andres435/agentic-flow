@@ -57,6 +57,16 @@ the close back to it. Nothing creates that file any more.
 4. **Reclose `/complete-task`** when `reopenedAtUtc` is set: `Close-Ticket.ps1` sets `reclosedAtUtc` = now. **Do not** overwrite `completedAtUtc`.
 5. Never replace the original `[startedAtUtc, completedAtUtc]` pair with a single span that includes idle days between close and reopen.
 
+### Parked tickets
+
+A ticket that stops before `/complete-task` (tracker state "needs more info", or closed early) is recorded
+with `scripts/ticket/Park-Ticket.ps1 -Outcome more-info|closed-by-ado`. It closes the open span at now
+(an explicit entry in `spans`), stamps `parkedAtUtc`, `parkedState`, `parkedOutcome` and `parkedHours`,
+and writes a ledger row whose `Outcome` column is the outcome (no scorecard, no points). Resuming runs
+`Resume-Ticket.ps1`, which opens a `resume` span at the resume time and moves the park stamps to
+`parkHistory`; `Close-Ticket.ps1` ends the open span and sums every span, so the idle gap is never
+counted. `completedAtUtc` is only set by the final close.
+
 ## Time Calculation (complete-task / prep-pr)
 
 Run `scripts/ticket/Get-SessionHours.ps1 -Ticket <ticket> -Preview` for the approval package:

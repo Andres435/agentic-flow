@@ -51,6 +51,11 @@
     Occupancy of the /review-changes chat (ledger CtxR%). Copied from the
     manifest ctxPct.review when omitted.
 
+.PARAMETER Outcome
+    Blank (the default) is a ticket that closed through /complete-task. more-info or
+    closed-by-ado records a ticket that stopped before it (Park-Ticket.ps1): a parked row has
+    no scorecard or points, and a later real close replaces it.
+
 .PARAMETER Pr
     PR number or URL, if one was created.
 
@@ -143,6 +148,10 @@ param(
     [string]$Lanes,
 
     [Parameter(ParameterSetName = 'Row')]
+    [ValidateSet('', 'completed', 'more-info', 'closed-by-ado')]
+    [string]$Outcome,
+
+    [Parameter(ParameterSetName = 'Row')]
     [switch]$Remove,
 
     [string]$Root,
@@ -183,13 +192,13 @@ if (-not (Test-Path -LiteralPath $PlansDir)) { New-Item -ItemType Directory -Pat
 # The epoch comes from the workflow that ran the close (this script's own clone), not -Root.
 $EpochId = Get-WorkflowEpochId -Root (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
 
-$Columns = @('Ticket', 'Type', 'Closed', 'Mode', 'Hours', 'Pts', 'E', 'C', '$tok', 'CtxS%', 'CtxR%', 'Ctx%', 'PR', 'Lanes', 'Epoch', 'Reopened', 'Days', 'PRFind')
+$Columns = @('Ticket', 'Type', 'Closed', 'Mode', 'Hours', 'Pts', 'E', 'C', '$tok', 'CtxS%', 'CtxR%', 'Ctx%', 'PR', 'Lanes', 'Epoch', 'Reopened', 'Days', 'PRFind', 'Outcome')
 
 function New-LedgerRow {
     param([string]$Ticket, [string]$Type, [string]$Closed, [string]$Mode,
           [string]$Hours, [string]$Pts, [string]$E, [string]$C, [string]$Tok,
           [string]$CtxS, [string]$CtxR, [string]$Ctx, [string]$Pr, [string]$Lanes, [string]$Epoch,
-          [string]$Reopened = '', [string]$Days = '', [string]$PRFind = '')
+          [string]$Reopened = '', [string]$Days = '', [string]$PRFind = '', [string]$Outcome = '')
     [pscustomobject]@{
         Ticket = $Ticket
         Type   = $Type
@@ -209,6 +218,7 @@ function New-LedgerRow {
         Reopened = $Reopened
         Days   = $Days
         PRFind = $PRFind
+        Outcome = $Outcome
     }
 }
 
@@ -312,6 +322,8 @@ function Get-ManifestOutcomes {
             $end = $null
             if ($reopened -and $names -contains 'reclosedAtUtc') { $end = ConvertTo-UtcInstant $mf.reclosedAtUtc }
             if (-not $end -and $names -contains 'completedAtUtc') { $end = ConvertTo-UtcInstant $mf.completedAtUtc }
+            # A parked ticket has no completedAtUtc: its span runs to the park stamp.
+            if (-not $end -and $names -contains 'parkedAtUtc') { $end = ConvertTo-UtcInstant $mf.parkedAtUtc }
             if ($start -and $end -and $end -ge $start) {
                 $out.Days = ([math]::Round(($end - $start).TotalDays, 1, [MidpointRounding]::AwayFromZero)).ToString('F1', [System.Globalization.CultureInfo]::InvariantCulture)
             }
@@ -340,7 +352,7 @@ if (Test-Path -LiteralPath $OutPath) {
         $rows.Add((New-LedgerRow -Ticket $cells[0] -Type $cells[1] -Closed $cells[2] -Mode $cells[3] `
             -Hours $cells[4] -Pts $cells[5] -E $cells[6] -C $cells[7] -Tok $cells[8] `
             -CtxS $cells[9] -CtxR $cells[10] -Ctx $cells[11] -Pr $cells[12] -Lanes $cells[13] -Epoch $cells[14] `
-            -Reopened $cells[15] -Days $cells[16] -PRFind $cells[17]))
+            -Reopened $cells[15] -Days $cells[16] -PRFind $cells[17] -Outcome $cells[18]))
     }
 }
 $ratedEpochs = @(Get-LedgerRatedEpochs -LedgerPath $OutPath)
@@ -460,7 +472,8 @@ elseif (-not $Rewrite -and -not $MarkRated) {
         -Pr (Get-Blank $Pr) `
         -Lanes (Get-Blank $lanesValue) `
         -Epoch $EpochId `
-        -Reopened $outcomes.Reopened -Days $outcomes.Days -PRFind $outcomes.PRFind))
+        -Reopened $outcomes.Reopened -Days $outcomes.Days -PRFind $outcomes.PRFind `
+        -Outcome $(if ($Outcome -eq 'completed') { '' } else { Get-Blank $Outcome })))
     }
 }
 
@@ -495,8 +508,8 @@ $sorted = $rows | Sort-Object @{ Expression = { if ($_.Closed) { $_.Closed } els
 $sb = New-Object System.Text.StringBuilder
 [void]$sb.AppendLine('# Ticket ledger')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('One row per closed ticket. Written by `scripts/ticket/Update-TicketLedger.ps1` at')
-[void]$sb.AppendLine('`/complete-task` -- do not hand-edit, the script owns this format.')
+[void]$sb.AppendLine('One row per closed or parked ticket. Written by `scripts/ticket/Update-TicketLedger.ps1` at')
+[void]$sb.AppendLine('`/complete-task` (or `Park-Ticket.ps1`) -- do not hand-edit, the script owns this format.')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('This replaces the per-ticket `<ticket>-closeout.md` files. Durable *lessons* live in')
 [void]$sb.AppendLine('[closeout-index.md](closeout-index.md); a full closeout page is written only when a')
@@ -520,6 +533,7 @@ $coverageLabel = if ($coverageOf -ge 11) { "last $coverageOf" } else { "$coverag
 [void]$sb.AppendLine('`Epoch` is the workflow contract a row closed under; compare rows within one epoch. Blank = before epochs were recorded.')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('E, C and $tok are self-rated; Reopened, Days and PRFind are computed from manifests.')
+[void]$sb.AppendLine('`Outcome` is blank for a ticket closed through `/complete-task`; `more-info` or `closed-by-ado` is a parked ticket (no scorecard, hours exclude the idle gap).')
 if ($ratedEpochs.Count) {
     [void]$sb.AppendLine('')
     [void]$sb.AppendLine('Rated: ' + ($ratedEpochs -join ', '))
@@ -528,7 +542,7 @@ if ($ratedEpochs.Count) {
 [void]$sb.AppendLine('| ' + ($Columns -join ' | ') + ' |')
 [void]$sb.AppendLine('|' + ('---|' * $Columns.Count))
 foreach ($r in $sorted) {
-    [void]$sb.AppendLine("| $($r.Ticket) | $($r.Type) | $($r.Closed) | $($r.Mode) | $($r.Hours) | $($r.Pts) | $($r.E) | $($r.C) | $($r.Tok) | $($r.CtxS) | $($r.CtxR) | $($r.Ctx) | $($r.PR) | $($r.Lanes) | $($r.Epoch) | $($r.Reopened) | $($r.Days) | $($r.PRFind) |")
+    [void]$sb.AppendLine("| $($r.Ticket) | $($r.Type) | $($r.Closed) | $($r.Mode) | $($r.Hours) | $($r.Pts) | $($r.E) | $($r.C) | $($r.Tok) | $($r.CtxS) | $($r.CtxR) | $($r.Ctx) | $($r.PR) | $($r.Lanes) | $($r.Epoch) | $($r.Reopened) | $($r.Days) | $($r.PRFind) | $($r.Outcome) |")
 }
 
 # UTF-8 with NO BOM. Set-Content -Encoding utf8 on PS 5.1 emits a BOM, which then

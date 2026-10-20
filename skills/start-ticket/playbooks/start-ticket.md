@@ -99,6 +99,10 @@ commands resolve the mode with `Resolve-TicketRoot.ps1`.
      `null`; never overwrite `startedAtUtc` or `completedAtUtc`. Then the short retrospective in
      [../../complete-task/references/task-retrospective.md](../../complete-task/references/task-retrospective.md)
      (After PR feedback, or on reopen). Do not write the first ledger row here.
+   - **Resume a parked ticket** (manifest has `parkedAtUtc`: it stopped at "needs more info" or was
+     closed early, via `Park-Ticket.ps1`): run `scripts/ticket/Resume-Ticket.ps1 -Ticket <key>`.
+     It opens a `resume` span at now so the idle gap is excluded and clears the park stamps; never
+     overwrite `startedAtUtc`. The final `/complete-task` close sums every span.
    - Ambiguous repos or integration after the profile list: ask before provisioning.
 
 4. **Worktree only** — provision per [../references/worktree-handoff.md](../references/worktree-handoff.md#provision-step-4).

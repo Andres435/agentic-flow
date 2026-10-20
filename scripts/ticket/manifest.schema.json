@@ -12,6 +12,11 @@
     "completedAtUtc": { "type": ["string", "null"] },
     "reopenedAtUtc": { "type": ["string", "null"] },
     "reclosedAtUtc": { "type": ["string", "null"] },
+    "parkedAtUtc": { "type": ["string", "null"] },
+    "parkedState": { "type": ["string", "null"] },
+    "parkedOutcome": { "type": ["string", "null"], "enum": ["more-info", "closed-by-ado", null] },
+    "parkedHours": { "type": ["number", "null"] },
+    "parkHistory": { "type": ["array", "null"] },
     "timezone": { "type": ["string", "null"] },
     "affectedRepos": {
       "type": "array",

@@ -116,7 +116,7 @@ files; do not paste raw JSON into chat. Older side files (`<ticket>-verify.json`
 
 `startedAtUtc`, `completedAtUtc`, `reopenedAtUtc`, `reclosedAtUtc`, and `timezone` live **on the
 manifest**. Field semantics and the hours math stay in
-[session-time-tracking.md](../skills/complete-task/references/session-time-tracking.md).
+[session-time-tracking.md](../skills/complete-task/references/session-time-tracking.md). A ticket that stops before `/complete-task` adds `parkedAtUtc`, `parkedState`, `parkedOutcome`, `parkedHours` and a closed span (`Park-Ticket.ps1`); `Resume-Ticket.ps1` moves them to `parkHistory`; `-Phase park` checks the stamp, no open span, and the one ledger row.
 
 ## Handoff between chats
 
