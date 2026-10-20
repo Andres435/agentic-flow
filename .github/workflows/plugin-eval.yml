@@ -1,0 +1,63 @@
+name: Plugin evals
+
+# Manual only: every run is real model calls. Needs the repo secret ANTHROPIC_API_KEY.
+# Runs the cases in evals/, then the real gate over what each run wrote (claude plugin eval
+# has no shell grader, so Assert-EvalArtifacts does it). Runs per case come from each
+# evals/<case>/prompt.md or case.yaml.
+on:
+  workflow_dispatch:
+    inputs:
+      max_cost_usd:
+        description: Stop and report partial results past this list-price estimate
+        default: '10'
+      model:
+        description: Model for the cases (pinned so a rollout is not read as a regression)
+        type: choice
+        options: [sonnet, haiku, opus]
+        default: sonnet
+
+permissions:
+  contents: read
+
+jobs:
+  plugin-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code@2.1.287
+
+      # Inputs reach the shell only as validated env vars, never as expression text in the script.
+      # --scaffold runs this repo's own case scaffolds (review-staged-secret, prep-pr-approval seed their folder).
+      - name: Run evals
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EVAL_MODEL: ${{ inputs.model }}
+          EVAL_MAX_COST: ${{ inputs.max_cost_usd }}
+        run: |
+          case "$EVAL_MODEL" in sonnet|haiku|opus) ;; *) echo "model must be sonnet, haiku or opus"; exit 1 ;; esac
+          [[ "$EVAL_MAX_COST" =~ ^[0-9]+(\.[0-9]+)?$ ]] || { echo "max_cost_usd must be a number"; exit 1; }
+          claude plugin eval . --eval-dir evals --trust-plugin --ablation none \
+            --allow-tools Write Edit --scaffold --keep-temp --no-publish --threshold 1.0 \
+            --model "$EVAL_MODEL" --max-cost-usd "$EVAL_MAX_COST" \
+            --json eval-results.json
+
+      - name: Gate over the written artifacts
+        if: always()
+        shell: pwsh
+        run: ./scripts/ticket/Assert-EvalArtifacts.ps1 -Results ./eval-results.json
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        if: always()
+        with:
+          name: eval-results
+          path: |
+            eval-results.json
+            evals/results/

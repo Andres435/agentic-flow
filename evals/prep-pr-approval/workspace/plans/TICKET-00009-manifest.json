@@ -1,0 +1,47 @@
+{
+  "ticket": "TICKET-00009",
+  "mode": "branch",
+  "workType": "bug",
+  "title": "Late fee is charged inside the grace period",
+  "state": "In Progress",
+  "priority": 3,
+  "affectedRepos": [
+    {
+      "repo": "app",
+      "local": true
+    }
+  ],
+  "startedAtUtc": "2026-10-09T13:00:00Z",
+  "ctxPct": {
+    "start": 38,
+    "review": 45,
+    "close": 40
+  },
+  "verify": {
+    "repos": {
+      "app": {
+        "pass": true,
+        "tests": "pass",
+        "sonar": "not-run",
+        "failing": [],
+        "atUtc": "2026-10-05T18:00:00Z",
+        "evidenceVersion": 1,
+        "evidence": {
+          "path": "plans/evidence.log",
+          "sha256": "43096EF53AF2624E7892970C03535B9290B67B596DB3731AC3921E1CB4A50DE0"
+        }
+      }
+    }
+  },
+  "reviewReady": {
+    "mode": "staged",
+    "atUtc": "2026-10-05T18:30:00Z",
+    "repos": {
+      "app": {
+        "verdict": "Ready",
+        "fingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      }
+    }
+  },
+  "completedAtUtc": "2026-10-09T16:00:00Z"
+}
