@@ -1,0 +1,2 @@
+# Git runs these hooks under sh: a CRLF checkout (core.autocrlf=true) breaks the shebang line.
+hooks/git-hooks/* text eol=lf
