@@ -2,11 +2,11 @@
 
 Two layouts:
 
-- **One product** (TMO-style). This clone sits next to related repos. `/start-new-project` fills
+- **One product** (several related repos). This clone sits next to them. `/start-new-project` fills
   the root `profile.json`, the status boxes below, and `environments/local-dev.md`.
-- **Many small GitHub apps.** Keep this host (`agentic-flow`) once. `/start-new-project` (blank
+- **Many small GitHub apps.** Keep this host once (any folder name; the docs say `agentic-flow`). `/start-new-project` (blank
   product) or `/adopt-project` (existing checkout) writes `apps/<id>/` and a row in
-  [apps/registry.json](apps/registry.json). Personal context stays here; `AGENTS.md` and shared
+  `apps/registry.json` (local; shape in [registry.example.json](apps/registry.example.json)). Personal context stays here, out of git; `AGENTS.md` and shared
   rules go in the app.
 
 Hand-editing still works. Sections marked `(required)` must be done before `/start-ticket`.
@@ -37,6 +37,9 @@ Filled by `/start-new-project`. Leave this blank until that command runs.
 
 ## 1. Edit `profile.json` (required)
 
+> Only Claude Code has run the enforcement gates end to end. Cursor is untested against them and
+> the Codex adapter is experimental, so check the gates once in your IDE before relying on them.
+
 Open `profile.json` and fill in your project's values:
 
 | Field | What to set |
@@ -46,7 +49,7 @@ Open `profile.json` and fill in your project's values:
 | `ticketSystem` | `none` \| `github-issues` \| `ado` |
 | `ticketPrefix` | Ticket ID prefix (e.g. `TICKET-`, `#`, `WI`) |
 | `repos[].name` | Your repo name(s) |
-| `repos[].path` | Path relative to the `.cursor` folder (`.` for same repo) |
+| `repos[].path` | `.` when the workflow sits inside this repo (the opened checkout). Otherwise clones are found beside the workflow by `name`, and `path` is used only when there is no `name` |
 | `specialists` | Match names to agent files in `agents/` |
 | `stacks.services` | One object per local app: `name`, `command`, plus optional `cwd`, `setup`, `stop`, `env`, `port`, `url`, `ready`, `dependsOn`. `/start-new-project` fills this; empty means no local stack. See [Stack recipes](#stack-recipes) |
 | `stacks.presets` | Name to service names (empty list = all). `stacks.default` names the preset used when none is given |

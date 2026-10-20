@@ -4,17 +4,22 @@
  * Script path guard (opt-in). Some machines run an application allowlist (for example
  * ThreatLocker) that lets .ps1 and .py run only from under one folder, and every blocked
  * attempt is an approval request to the user. Set AGENTIC_SCRIPT_ALLOW_ROOT to a regular
- * expression that matches the allowed path (for example `[\\/]source[\\/]repos[\\/]`) and this
+ * expression anchored to the allowed path, for example
+ * `^(?:[A-Za-z]:[\\/]Users[\\/][^\\/]+|/(?:home|Users)/[^/]+)[\\/]source[\\/]repos[\\/]`, and this
  * hook denies writing or running such a script anywhere else (temp, an agent scratchpad,
- * Documents) so the attempt never reaches the allowlist. With the variable unset it allows
- * everything. Names no IDE; the Cursor and Claude hooks translate { action, reason }.
+ * Documents) so the attempt never reaches the allowlist. Leave the `^` in: an unanchored pattern
+ * lets C:\Temp\source\repos\x.ps1 through. A home prefix (~, $HOME, $env:USERPROFILE,
+ * %USERPROFILE%) is expanded and `..` collapsed before matching. With the variable unset it
+ * allows everything. Names no IDE; the Cursor and Claude hooks translate { action, reason }.
  *
  *   write  tool_input.file_path of a Write/Edit
  *   run    a shell command that names a .ps1/.py by an absolute or env-rooted path
  */
 
+const os = require("os");
 const path = require("path");
 const SCRIPT = /\.(?:ps1|py)$/i;
+const HOME_PREFIX = /^(?:~|\$HOME|\$env:USERPROFILE|%USERPROFILE%)(?=[\\/])/i;
 // Commands that only read, list or delete a path never execute it.
 const INERT = /^\s*(?:rm|del|erase|ls|dir|cat|type|head|tail|stat|Remove-Item|Get-ChildItem|Get-Content|Test-Path|Get-Item)\b/i;
 // An absolute, home-, or env-rooted token ending in .ps1/.py.
@@ -38,9 +43,13 @@ function allowedPattern() {
   }
 }
 
-/** `..` collapsed, so repos\..\..\Temp\x.ps1 is judged by where it really points. */
+/**
+ * Home prefix expanded and `..` collapsed, so ~\x.ps1 or repos\..\..\Temp\x.ps1 is judged by
+ * where it really points.
+ */
 function normalize(p) {
-  const s = String(p || "").replace(/^\/([A-Za-z])\//, "$1:/"); // Git Bash /c/... -> C:/...
+  let s = String(p || "").replace(HOME_PREFIX, () => os.homedir());
+  s = s.replace(/^\/([A-Za-z])\//, "$1:/"); // Git Bash /c/... -> C:/...
   return /^[A-Za-z]:/.test(s) ? path.win32.normalize(s) : path.posix.normalize(s);
 }
 

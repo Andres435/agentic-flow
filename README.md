@@ -5,16 +5,18 @@ plugin (`.cursor-plugin/`, `.claude-plugin/`, `.codex-plugin/`). Claude Code is 
 enforcement gates end to end; Cursor is untested against them and the Codex adapter is experimental. The
 shared core names verbs and model tiers. [adapters/](adapters/README.md) maps them per IDE.
 
-Use this clone as **one host for many small apps** (`apps/<id>/` plus [apps/registry.json](apps/registry.json)),
-or copy it beside a product the way TMO does. Product specifics live in that overlay
+Use this clone as **one host for many small apps** (`apps/<id>/` plus `apps/registry.json`, both kept out of git),
+or copy it beside one product made of several related repos. Product specifics live in that overlay
 [profile.json](profile.json), not in the core.
 
 **Day-to-day usage:** [USER-MANUAL.md](USER-MANUAL.md). **First clone:** [CUSTOMIZE.md](CUSTOMIZE.md).
 **New laptop:** [MACHINE-SETUP.md](MACHINE-SETUP.md). **Maintainers:** [TEMPLATE.md](TEMPLATE.md)
 (core vs overlay). **Finding a doc:** [INDEX.md](INDEX.md). **Terms** (manifest, tier, lane,
-receipt): [glossary](_shared/glossary.md).
+receipt): [glossary](_shared/glossary.md). **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md).
+**License:** [Apache-2.0](LICENSE).
 
-> **Host:** keep this folder as `agentic-flow` and register each personal GitHub repo in `apps/`.
+> **Host:** clone this folder once (the name is yours to pick; the docs say `agentic-flow`) and
+> register each personal GitHub repo in `apps/`.
 > **One product:** place this folder at `<your-app>/.cursor`, or at `source/repos/.cursor` in a
 > multi-repo workspace. Paths in the docs are relative to this folder.
 
@@ -80,7 +82,7 @@ Pin engineering mode for ad-hoc work, or for a long chat.
 | [output-styles/](output-styles/engineering-mode.md) | Engineering mode output style (Claude Code) | Core |
 | [commands/](commands/_README.md) | Menu notes. No shim duplicates a skill | Core |
 | [profile.json](profile.json) | Host (or one-product) overlay: repos, tracker, prefix, stack, slash list | **Overlay** |
-| [apps/](apps/README.md) | Per-app overlays and [registry.json](apps/registry.json) when this clone is the host | **Overlay** |
+| [apps/](apps/README.md) | Per-app overlays and `registry.json` when this clone is the host (local, gitignored) | **Overlay** |
 | [agents/](agents/README.markdown) | Specialists (stub: `fullstack-specialist.md`) | **Overlay** |
 | [environments/](environments/README.md) | Setup cards (stub: `local-dev.md`) | **Overlay** |
 | [rules/](rules/) | Cursor rules (stub pointers) | Overlay |
@@ -124,7 +126,8 @@ the claim then fails any doc that still says the old thing.
 
 ## Upgrading core in a project
 
-Core files can be copied from this repo without touching your overlay:
+Core files can be copied from this repo without touching your overlay. The URL is an example:
+point `upstream` at the template you track (this repo or your fork).
 
 ```bash
 git remote add upstream https://github.com/Andres435/agentic-flow.git

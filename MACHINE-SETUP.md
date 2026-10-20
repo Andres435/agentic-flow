@@ -7,7 +7,7 @@ product SDKs are not needed unless your project overlay adds them. Day-to-day ti
 ## 1. Folder layout
 
 **Host (many small apps).** Keep this clone as `agentic-flow`. Register each GitHub origin in
-[apps/registry.json](apps/registry.json). Opening that checkout loads this plugin plus `apps/<id>/`.
+`apps/registry.json` (copy [registry.example.json](apps/registry.example.json); gitignored). Opening that checkout loads this plugin plus `apps/<id>/`.
 Register the user-level `workspaceOpen` hook from [adapters/cursor/README.md](adapters/cursor/README.md).
 
 **One product.** Place this folder at `<app>/.cursor` (one repo) or `source/repos/.cursor` (sibling repos):
@@ -42,12 +42,16 @@ copy in `%LOCALAPPDATA%` can be blocked by application control.
 
 ### Application allowlist
 
-If an application allowlist (for example ThreatLocker) guards the machine, keep the workspace
+If endpoint allowlisting (application control that only runs scripts from approved folders) guards the machine, keep the workspace
 clones and this template clone under the one allowed root, and never let agents write helper scripts
 to temp or a scratchpad: only scripts run from the allowed root. Each blocked run is an approval
 prompt for you. To have the `script-path-guard` hook deny those attempts before they reach the
 allowlist, set the user environment variable `AGENTIC_SCRIPT_ALLOW_ROOT` to a regular expression for
-the allowed path, for example `[\\/]source[\\/]repos[\\/]`. Unset, the hook allows everything.
+the allowed path, anchored with `^`, for example
+`^(?:[A-Za-z]:[\\/]Users[\\/][^\\/]+|/(?:home|Users)/[^/]+)[\\/]source[\\/]repos[\\/]`. An unanchored
+pattern also matches `source\repos` nested under temp or another folder. The hook expands `~`,
+`$HOME`, `$env:USERPROFILE` and `%USERPROFILE%` and collapses `..` before matching. Unset, the hook
+allows everything.
 
 ## 3. Bootstrap
 
