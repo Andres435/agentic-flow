@@ -61,16 +61,7 @@ if (Test-Path -LiteralPath $profilePath) {
         $prefix = [string]$profileJson.ticketPrefix
     }
     if ($profileJson.PSObject.Properties.Name -contains 'repos') {
-        $names = @($profileJson.repos | ForEach-Object {
-            if ($_ -is [string]) { return $_ }
-            $rel = [string]$_.path
-            $name = [string]$_.name
-            # Hosted single-repo overlays use path "." at the opened checkout.
-            # Product clones still live beside the workflow under repos[].name.
-            if ($rel -eq '.') { return '.' }
-            if ($name) { return $name }
-            $rel
-        } | Where-Object { $_ })
+        $names = @($profileJson.repos | ForEach-Object { Get-ProfileRepoDir $_ } | Where-Object { $_ })
     }
 }
 

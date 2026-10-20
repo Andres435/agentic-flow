@@ -1,0 +1,14 @@
+{
+  "_comment": "Shared cases for profile repos[] -> folder: session-context.js profileRepoDir and ManifestFields.ps1 Get-ProfileRepoDir must agree. Rule: a string is the folder; path \".\" is the opened checkout; otherwise name, then path. dir null = skip the entry.",
+  "cases": [
+    { "repo": "api", "dir": "api" },
+    { "repo": { "name": "api" }, "dir": "api" },
+    { "repo": { "name": "api", "path": "." }, "dir": "." },
+    { "repo": { "path": "." }, "dir": "." },
+    { "repo": { "name": "api", "path": "src/api" }, "dir": "api" },
+    { "repo": { "path": "../other" }, "dir": "../other" },
+    { "repo": { "name": "", "path": "" }, "dir": null },
+    { "repo": {}, "dir": null },
+    { "repo": null, "dir": null }
+  ]
+}

@@ -35,7 +35,7 @@ What is **core** (stable across products) vs **overlay** (per project).
 | Path | Notes |
 |---|---|
 | `profile.json` | Host or one-product config. `/start-new-project` fills it. Do not drop `slashCommands` |
-| `apps/` | Per-app overlays and `registry.json` when this clone is the host |
+| `apps/` | Per-app overlays and `registry.json` when this clone is the host. Gitignored except `README.md` and `registry.example.json` |
 | `CUSTOMIZE.md` | Checklist |
 | `agents/` | Specialists |
 | `environments/` | Env cards |

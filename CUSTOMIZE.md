@@ -6,7 +6,7 @@ Two layouts:
   the root `profile.json`, the status boxes below, and `environments/local-dev.md`.
 - **Many small GitHub apps.** Keep this host (`agentic-flow`) once. `/start-new-project` (blank
   product) or `/adopt-project` (existing checkout) writes `apps/<id>/` and a row in
-  [apps/registry.json](apps/registry.json). Personal context stays here; `AGENTS.md` and shared
+  `apps/registry.json` (local; shape in [registry.example.json](apps/registry.example.json)). Personal context stays here, out of git; `AGENTS.md` and shared
   rules go in the app.
 
 Hand-editing still works. Sections marked `(required)` must be done before `/start-ticket`.
@@ -46,7 +46,7 @@ Open `profile.json` and fill in your project's values:
 | `ticketSystem` | `none` \| `github-issues` \| `ado` |
 | `ticketPrefix` | Ticket ID prefix (e.g. `TICKET-`, `#`, `WI`) |
 | `repos[].name` | Your repo name(s) |
-| `repos[].path` | Path relative to the `.cursor` folder (`.` for same repo) |
+| `repos[].path` | `.` when the workflow sits inside this repo (the opened checkout). Otherwise clones are found beside the workflow by `name`, and `path` is used only when there is no `name` |
 | `specialists` | Match names to agent files in `agents/` |
 | `stacks.services` | One object per local app: `name`, `command`, plus optional `cwd`, `setup`, `stop`, `env`, `port`, `url`, `ready`, `dependsOn`. `/start-new-project` fills this; empty means no local stack. See [Stack recipes](#stack-recipes) |
 | `stacks.presets` | Name to service names (empty list = all). `stacks.default` names the preset used when none is given |

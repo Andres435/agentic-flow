@@ -7,7 +7,7 @@ product SDKs are not needed unless your project overlay adds them. Day-to-day ti
 ## 1. Folder layout
 
 **Host (many small apps).** Keep this clone as `agentic-flow`. Register each GitHub origin in
-[apps/registry.json](apps/registry.json). Opening that checkout loads this plugin plus `apps/<id>/`.
+`apps/registry.json` (copy [registry.example.json](apps/registry.example.json); gitignored). Opening that checkout loads this plugin plus `apps/<id>/`.
 Register the user-level `workspaceOpen` hook from [adapters/cursor/README.md](adapters/cursor/README.md).
 
 **One product.** Place this folder at `<app>/.cursor` (one repo) or `source/repos/.cursor` (sibling repos):
