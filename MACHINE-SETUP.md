@@ -47,7 +47,11 @@ clones and this template clone under the one allowed root, and never let agents 
 to temp or a scratchpad: only scripts run from the allowed root. Each blocked run is an approval
 prompt for you. To have the `script-path-guard` hook deny those attempts before they reach the
 allowlist, set the user environment variable `AGENTIC_SCRIPT_ALLOW_ROOT` to a regular expression for
-the allowed path, for example `[\\/]source[\\/]repos[\\/]`. Unset, the hook allows everything.
+the allowed path, anchored with `^`, for example
+`^(?:[A-Za-z]:[\\/]Users[\\/][^\\/]+|/(?:home|Users)/[^/]+)[\\/]source[\\/]repos[\\/]`. An unanchored
+pattern also matches `source\repos` nested under temp or another folder. The hook expands `~`,
+`$HOME`, `$env:USERPROFILE` and `%USERPROFILE%` and collapses `..` before matching. Unset, the hook
+allows everything.
 
 ## 3. Bootstrap
 
