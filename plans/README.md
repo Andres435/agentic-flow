@@ -35,7 +35,8 @@ Humans: [../USER-MANUAL.md](../USER-MANUAL.md) (reload these files instead of re
 
 1. **Don't hand-edit** `ticket-ledger.md` — the script owns its format. Don't hand-edit session
    timestamps either unless you are correcting a bad clock; `/complete-task` owns the math.
-2. After a reopen, `/start-ticket` sets `reopenedAtUtc`; don't reset `startedAtUtc`. Re-running
+2. After a reopen, `/start-ticket` sets `reopenedAtUtc`; don't reset `startedAtUtc`. A ticket parked before
+   `/complete-task` (`Park-Ticket.ps1`) is resumed with `Resume-Ticket.ps1`, which opens a new span. Re-running
    `Update-TicketLedger.ps1` replaces that ticket's row rather than adding one.
 3. Use the manifest to see which mode, repos, and specialists a ticket claimed without re-asking the
    agent.

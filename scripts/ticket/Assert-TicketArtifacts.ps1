@@ -22,6 +22,10 @@
                    content: a plan approved before those requirements existed must not
                    retroactively fail here. This is also the LOAD-TIME gate for
                    /complete-task -- see the note on -Phase close below.
+    Park-Ticket    runs -Phase park      after its ledger row. A ticket that stops before
+                   /complete-task (needs more info, or closed early) needs parkedAtUtc and
+                   parkedState on the manifest, no open span, and one ledger row. No scorecard,
+                   receipt, review stamp or completedAtUtc.
     complete-task  runs -Phase close     after the ledger row, NOT at chat start.
                    The close timestamp and the ledger row are written during the
                    command, so running this at load is a guaranteed FAIL.
@@ -50,7 +54,7 @@
     Work item, with or without the ticket prefix (TICKET-42 or 42).
 
 .PARAMETER Phase
-    start | implement | prepush | close
+    start | implement | prepush | close | park
 
     prepush runs the work checks of close (verify receipts, review stamps with no open
     Blocker/Major, frontend Drive) and nothing that is written at close (timestamps,
@@ -73,7 +77,7 @@ param(
     [string]$Ticket,
 
     [Parameter(Mandatory)]
-    [ValidateSet('start', 'implement', 'prepush', 'close')]
+    [ValidateSet('start', 'implement', 'prepush', 'close', 'park')]
     [string]$Phase,
 
     # Override the repo root (for testing against fixtures).
@@ -872,7 +876,28 @@ function Test-LedgerRow {
     }
 }
 
+function Test-ParkStamp {
+    if (-not $manifest) { return }   # Test-Artifact already reported the missing manifest
+    $names = @($manifest.PSObject.Properties.Name)
+    foreach ($field in @('parkedAtUtc', 'parkedState')) {
+        if (-not ($names -contains $field) -or [string]::IsNullOrWhiteSpace([string]$manifest.$field)) {
+            $missing.Add("$Key-manifest.json -- no $field; run scripts/ticket/Park-Ticket.ps1 -Ticket $Key -Outcome more-info|closed-by-ado")
+        }
+        else { $found.Add("$Key-manifest.json ($field)") }
+    }
+    $open = @(@(if ($names -contains 'spans') { $manifest.spans }) | Where-Object { $_ -and $_.startedAtUtc -and -not $_.endedAtUtc })
+    if ($open.Count) {
+        $missing.Add("$Key-manifest.json -- $($open.Count) span(s) still open on a parked ticket; the idle gap would count as hours")
+    }
+}
+
 switch ($Phase) {
+    'park' {
+        Test-ManifestSchema
+        Test-Artifact "$Key-manifest.json" 'a parked ticket keeps its manifest' | Out-Null
+        Test-ParkStamp
+        Test-LedgerRow
+    }
     'start' {
         Test-ManifestSchema
         Test-Manifest 'routing table for every later chat (must include ticket object with title/adoType/state/area/priority)'

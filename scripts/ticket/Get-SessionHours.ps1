@@ -6,7 +6,9 @@
 .DESCRIPTION
     Hours come from closed spans, not from the wall clock between the first start
     and the last close. Original and reopen spans are the manifest timestamps.
-    A pr-feedback span is written by -BeginSpan and -EndSpan. Weekends and US
+    A pr-feedback span is written by -BeginSpan and -EndSpan. A ticket parked before
+    /complete-task (Park-Ticket.ps1) closes its original span at the park time, and
+    Resume-Ticket.ps1 opens a resume span, so the idle gap is never counted. Weekends and US
     federal holidays count as zero. Each local calendar day is capped at 8 hours
     across every span. Gaps between spans are zero. The point bucket is printed
     only. This script does not write a tracker field.
@@ -164,7 +166,11 @@ if ($EndSpan) {
 if ($Preview) {
     $nowIso = [DateTime]::UtcNow.ToString('o')
     $startedAt = Get-Prop $manifest 'startedAtUtc'
-    if ($startedAt -and -not (Get-Prop $manifest 'completedAtUtc')) {
+    # A resumed ticket carries an explicit original span (written by Park-Ticket.ps1) and an
+    # open resume span; count the open one to now instead of re-deriving the original.
+    foreach ($open in @($spans | Where-Object { $_.startedAtUtc -and -not $_.endedAtUtc })) { $open.endedAtUtc = $nowIso }
+    $hasOriginal = @($spans | Where-Object { $_.kind -eq 'original' }).Count -gt 0
+    if ($startedAt -and -not $hasOriginal -and -not (Get-Prop $manifest 'completedAtUtc')) {
         $spans.Add([pscustomobject]@{ kind = 'original'; startedAtUtc = [string]$startedAt; endedAtUtc = $nowIso })
     }
     $reopenedAt = Get-Prop $manifest 'reopenedAtUtc'

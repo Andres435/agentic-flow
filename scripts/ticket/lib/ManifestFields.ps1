@@ -24,10 +24,21 @@ function Get-TicketKeyFromRaw {
     return (Get-TicketPrefix) + $digits
 }
 
+# ConvertFrom-Json turns an ISO timestamp into a DateTime; [string] of that loses the zone.
+# Returns the instant as round-trip UTC text, or '' when empty.
+function ConvertTo-IsoUtcText {
+    param($Value)
+    if ($null -eq $Value) { return '' }
+    if ($Value -is [datetime]) { return $Value.ToUniversalTime().ToString('o') }
+    return [string]$Value
+}
+
 # Open = never closed, or reopened and not yet re-closed (a reopen keeps completedAtUtc).
 function Test-TicketManifestOpen {
     param($Manifest)
     $names = @($Manifest.PSObject.Properties.Name)
+    # Parked (Park-Ticket.ps1) is idle, not open, until Resume-Ticket.ps1 clears the stamp.
+    if (($names -contains 'parkedAtUtc') -and $Manifest.parkedAtUtc) { return $false }
     $completed = ($names -contains 'completedAtUtc') -and $Manifest.completedAtUtc
     if (-not $completed) { return $true }
     $reopened = ($names -contains 'reopenedAtUtc') -and $Manifest.reopenedAtUtc
