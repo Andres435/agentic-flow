@@ -18,6 +18,8 @@ const { resolveApp } = require("./resolve-app");
 const { findPwshOnPath } = require("./pwsh.js");
 
 const REPO_ROOT = path.join(__dirname, "..", "..");
+// Leave headroom for a cold or loaded PowerShell host; session context still fails open on timeout.
+const RESOLVE_TICKET_TIMEOUT_MS = 15000;
 
 function loadProfile(overlayRoot) {
   const candidates = [];
@@ -144,7 +146,7 @@ function runResolve(ticket) {
       const result = execFileSync(
         shell,
         ["-NoProfile", "-NonInteractive", "-File", scriptPath, "-Ticket", ticket, "-Json"],
-        { timeout: 6000, encoding: "utf8" }
+        { timeout: RESOLVE_TICKET_TIMEOUT_MS, encoding: "utf8" }
       );
       return JSON.parse(String(result).trim());
     } catch (err) {

@@ -20,7 +20,7 @@ node hooks/tests/context-usage.test.js
 | Test file | Under test | What it checks |
 |---|---|---|
 | `closeout-guard.test.js` | `core/closeout-guard.js` via the Cursor adapter | Deny closeout dumps, allow other files, degrade on bad JSON |
-| `session-context.test.js` | `core/session-context.js` via the Cursor adapter | Packet shape, env keys, graceful degrade without PowerShell, a reopened ticket stays open, a stamped PR with no ledger row nudges complete-task, `profileRepoDir` matches `scripts/ticket/fixtures/profile-repo-dirs.json` (parity with `Get-ProfileRepoDir`) |
+| `session-context.test.js` | `core/session-context.js` via the Cursor adapter | Packet shape, env keys, graceful degrade without PowerShell, ticket-root resolution has a 15-second fail-open timeout, a reopened ticket stays open, a stamped PR with no ledger row nudges complete-task, `profileRepoDir` matches `scripts/ticket/fixtures/profile-repo-dirs.json` (parity with `Get-ProfileRepoDir`) |
 | `resolve-app.test.js` | `core/resolve-app.js` | Origin normalize, registry match (missing, malformed, incomplete entries), git toplevel as the checkout, host plus overlay plugin paths |
 | `git-push-agentic-flow.test.js` | `core/push-gate.js`, both adapters, Claude `git-guard.js` | A failing workflow clone is denied through Cursor, Claude Bash, and Claude PowerShell; a ticket branch with a manifest runs `-Phase prepush`; a crash fails closed; `echo "git push"` is not a push |
 | `ticket-command-nudge.test.js` | `core/ticket-nudge.js` via the Cursor adapter | Fire only on a leading slash command; the close nudge names Close-Ticket.ps1; engineering-mode names the playbook |
