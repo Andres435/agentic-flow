@@ -12,6 +12,8 @@ const os = require("os");
 const path = require("path");
 
 process.env.TMO_SKIP_SWEEP = "1"; // the buildPacket calls below must not spawn for real
+const hookErrorLog = path.join(__dirname, "..", "..", "tmp", `session-sweep-errors-${process.pid}.log`);
+process.env.TMO_HOOK_ERRORS_FILE = hookErrorLog; // expected throwing-spawn errors stay test-local
 const { maybeSweep, buildPacket } = require(path.join(__dirname, "..", "core", "session-context.js"));
 
 let passed = 0;
@@ -111,4 +113,5 @@ test("packet output is byte-identical with and without the sweep", () => {
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);
+try { fs.rmSync(hookErrorLog, { force: true }); } catch { /* test cleanup is best effort */ }
 process.exit(failed ? 1 : 0);
