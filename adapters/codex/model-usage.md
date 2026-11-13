@@ -5,8 +5,10 @@ description: Model tiers mapped to Codex spawn_agent for a Codex parent. The pic
 
 # Codex Model Usage
 
-**Status: experimental.** No Codex parent has run `/doctor --lanes` yet, so this mapping is
-unverified. Prefer Cursor or Claude Code for ticket work until it has.
+**Status: partly probed 2026-11-12.** A Codex Desktop parent honored fast and standard, and left deep
+inline. The separate `codex exec` CLI did not honor either pinned selector (it returned the broad
+GPT family only). Codex Desktop is the supported tiered parent; `codex exec` is not. The Codex
+context hooks are wired in [hooks/hooks.json](hooks/hooks.json).
 
 Use this file when the parent session is Codex. Tiers and routing rules stay in
 [_shared/model-routing.md](../../_shared/model-routing.md). Load this file from `AGENTS.md`; Codex
@@ -28,6 +30,15 @@ workspace had no Codex install on 2026-09-25, so the cells below name the slot, 
 | `frontier` | a model the user names | only when the user asks | only when the user asks for it in this session |
 
 **`deepLane: inline`** — deep and `[high]` run on the session's model. Never dispatched.
+
+### `codex exec` probe
+
+On 2026-11-12, read-only probes used `codex exec --json --model <selector> --sandbox read-only
+--cd <repo> -` and asked the CLI to name its model. Pinned fast and standard selectors returned
+only the broad family name, so the response does not confirm the selected sub-tier; do not use
+`codex exec` as the tiered parent. The architect external-lane invocation
+`codex exec --sandbox read-only --skip-git-repo-check --ephemeral -` returned `GPT-6`, confirming
+that the CLI can run under the broad `gpt` family configuration.
 
 Every `spawn_agent` passes `model` from the tier. A lane whose first line names another family, or
 nothing, is discarded. Never dispatch the deep tier. If the model cannot be told, ask the user to

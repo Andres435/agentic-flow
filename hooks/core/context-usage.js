@@ -71,7 +71,7 @@ function fromTranscript(transcriptPath) {
   const lines = text.split(/\r?\n/);
   for (let i = lines.length - 1; i >= 0; i--) {
     const line = lines[i];
-    if (!line.includes('"usage"')) continue;
+    if (!line.includes('"usage"') && !line.includes('"input_tokens"')) continue;
     let row;
     try {
       row = JSON.parse(line);
@@ -81,11 +81,20 @@ function fromTranscript(transcriptPath) {
       continue;
     }
     const usage = row && row.message && row.message.usage;
-    if (!usage || row.isSidechain) continue;
-    const used =
-      Number(usage.input_tokens || 0) +
-      Number(usage.cache_creation_input_tokens || 0) +
-      Number(usage.cache_read_input_tokens || 0);
+    let used = 0;
+    if (usage && !row.isSidechain) {
+      used =
+        Number(usage.input_tokens || 0) +
+        Number(usage.cache_creation_input_tokens || 0) +
+        Number(usage.cache_read_input_tokens || 0);
+    } else if (row && (row.input_tokens !== undefined || row.cache_read_tokens !== undefined)) {
+      if (row.type === "PLANNER_RESPONSE" || row.source === "MODEL") {
+        used =
+          Number(row.input_tokens || 0) +
+          Number(row.cache_creation_input_tokens || 0) +
+          Number(row.cache_read_tokens || 0);
+      }
+    }
     if (!used) continue;
     const configured = Number(process.env.TMO_CONTEXT_WINDOW);
     const window = configured > 0 ? configured : used > 200000 ? 1000000 : 200000;
@@ -94,4 +103,20 @@ function fromTranscript(transcriptPath) {
   return null;
 }
 
-module.exports = { record, fromTranscript, usageFile };
+/**
+ * Context occupancy from a Codex PostModelRequest token_usage object. Codex input_tokens
+ * is the reported prompt total; cached_input_tokens is a subset and is not added again.
+ * Codex does not report the context window in this event, so use TMO_CONTEXT_WINDOW or
+ * the same heuristic as fromTranscript. A reported zero is a real 0% measurement; missing
+ * or invalid usage is unknown and returns null.
+ */
+function fromTokenUsage(usage) {
+  if (!usage || typeof usage !== "object" || Array.isArray(usage)) return null;
+  const used = usage.input_tokens;
+  if (typeof used !== "number" || !Number.isFinite(used) || used < 0) return null;
+  const configured = Number(process.env.TMO_CONTEXT_WINDOW);
+  const window = configured > 0 ? configured : used > 200000 ? 1000000 : 200000;
+  return (used / window) * 100;
+}
+
+module.exports = { record, fromTranscript, fromTokenUsage, usageFile };

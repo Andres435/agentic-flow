@@ -22,7 +22,7 @@ the affected repo path from `scripts/ticket/Resolve-TicketRoot.ps1`.
 ([_shared/model-routing.md](_shared/model-routing.md)). Each IDE maps tiers, subagent roles, and its
 `deepLane` in its adapter: [Cursor](adapters/cursor/model-usage.md),
 [Cursor GPT chat](adapters/gpt/model-usage.md), [Claude Code](adapters/claude/model-usage.md),
-[Codex](adapters/codex/model-usage.md). IDE actions are neutral verbs —
+[Antigravity](adapters/antigravity/model-usage.md), [Codex](adapters/codex/model-usage.md). IDE actions are neutral verbs —
 [_shared/harness-verbs.md](_shared/harness-verbs.md). Chat counts per mode: [USER-MANUAL.md](USER-MANUAL.md).
 
 **Engineering mode** (`/engineering-mode`, or the adapter's way to pin it) makes a chat an

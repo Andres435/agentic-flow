@@ -1,6 +1,6 @@
 ---
 name: harness-verbs
-description: The neutral verbs the shared workflow uses for IDE actions — ask-user, enter-plan / exit-plan, dispatch, report-context, rename-chat, search-x — and the one table that maps each verb to Cursor, Claude Code, and Codex. Core docs use the verb; only this file and adapters/ name IDE tools.
+description: The neutral verbs the shared workflow uses for IDE actions — ask-user, enter-plan / exit-plan, dispatch, report-context, rename-chat, search-x — and the one table that maps each verb to Cursor, Claude Code, Codex, and Antigravity. Core docs use the verb; only this file and adapters/ name IDE tools.
 keywords: harness verbs, ask-user, enter-plan, exit-plan, dispatch, report-context, rename-chat, search-x, plan mode, IDE neutral, adapter, tool names
 ---
 
@@ -29,16 +29,16 @@ Skills, playbooks, and agents name a **verb**, never an IDE tool. Each adapter u
 
 ## Map
 
-| Verb | Cursor | Claude Code | Codex |
-|---|---|---|---|
-| `ask-user` | `AskQuestion` | `AskUserQuestion` | ask in chat and stop |
-| `enter-plan` | `SwitchMode` `target_mode_id: plan` | `EnterPlanMode` | plan mode |
-| `exit-plan` | `SwitchMode` back to Agent; never Plan mode's native Build | `ExitPlanMode` after the chat approval (it is the approval step itself) | leave plan mode |
-| `dispatch` | `Task` (`subagent_type`, `model`) | `Agent` (`subagent_type`, `model`, `effort`) | `spawn_agent` (`model`, `reasoning_effort`) |
-| `report-context` | hook-measured, or the context-window indicator | hook-measured | blank (no Codex hook) |
-| `rename-chat` | `cursor-app-control` `rename_chat` | not supported | not supported |
-| `search-x` | `XSearch` | not supported — skip | not supported — skip |
+| Verb | Cursor | Claude Code | Codex | Antigravity |
+|---|---|---|---|---|
+| `ask-user` | `AskQuestion` | `AskUserQuestion` | ask in chat and stop | `ask_question` |
+| `enter-plan` | `SwitchMode` `target_mode_id: plan` | `EnterPlanMode` | plan mode | `/plan` slash command |
+| `exit-plan` | `SwitchMode` back to Agent; never Plan mode's native Build | `ExitPlanMode` after the chat approval (it is the approval step itself) | leave plan mode | approval in chat |
+| `dispatch` | `Task` (`subagent_type`, `model`) | `Agent` (`subagent_type`, `model`, `effort`) | `spawn_agent` (`model`, `reasoning_effort`) | `invoke_subagent` (`Model`, `Role`, `TypeName`, `Workspace`) |
+| `report-context` | hook-measured, or the context-window indicator | hook-measured | hook-measured by `PostModelRequest` from `token_usage.input_tokens`; uses `TMO_CONTEXT_WINDOW` or the shared 200k/1M heuristic because Codex omits the model window | hook-measured by `Stop` from transcript; uses `TMO_CONTEXT_WINDOW` or 1M default |
+| `rename-chat` | `cursor-app-control` `rename_chat` | not supported | not supported | not supported |
+| `search-x` | `XSearch` | not supported — skip | not supported — skip | not supported — skip |
 
 Subagent types and tier models: [Cursor](../adapters/cursor/model-usage.md) ·
 [Claude Code](../adapters/claude/model-usage.md) · [Codex](../adapters/codex/model-usage.md) ·
-[Cursor GPT](../adapters/gpt/model-usage.md).
+[Cursor GPT](../adapters/gpt/model-usage.md) · [Antigravity](../adapters/antigravity/model-usage.md).

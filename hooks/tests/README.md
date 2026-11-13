@@ -2,7 +2,9 @@
 
 Hook logic lives once in `hooks/core/` and names no IDE. Each IDE's hooks are thin
 stdin/stdout adapters: Cursor in `adapters/cursor/hooks/` (wired by the root `hooks.json`),
-Claude Code in `adapters/claude/hooks/` (wired by its `hooks.json`). The git hooks in
+Claude Code in `adapters/claude/hooks/` (wired by its `hooks.json`), Codex in
+`adapters/codex/hooks/` (wired by `.codex-plugin/plugin.json`), Antigravity in
+`adapters/antigravity/hooks/` (wired by `.antigravity-plugin/plugin.json`). The git hooks in
 `hooks/git-hooks/` use the same core, so the plans hard stop and the push gate hold outside
 any IDE.
 
@@ -29,7 +31,9 @@ node hooks/tests/context-usage.test.js
 | `secret-scan.test.js` | `core/secret-scan.js`, `core/commit-guard.js`, `git-hooks/pre-commit` | Deny a commit that adds a token-shaped secret (patterns in `scripts/ticket/secret-patterns.json`); never echo the token; `secret-scan:allow` exempts a line |
 | `session-sweep.test.js` | `core/session-context.js` `maybeSweep`, `core/pwsh.js` | Once-per-UTC-day detached `Clear-WorkflowScratch.ps1`; `TMO_SKIP_SWEEP=1` skips; a failing spawn never throws; packet output unchanged |
 | `hooks-manifest.test.js` | root `hooks.json` (Cursor) | Every matcher compiles with no control character (a JSON `` is a backspace) and fires on the commands its hook guards |
-| `context-usage.test.js` | `core/context-usage.js`, Claude Stop hook | Measured context from a transcript; per-session record |
+| `context-usage.test.js` | `core/context-usage.js`, Claude Stop and Antigravity Stop hooks, Codex PostModelRequest | Measured transcript/token usage; per-session record |
+| `adapters/codex/hooks/tests/codex-hooks.test.js` | Codex SessionStart and PostModelRequest adapters | Plugin wiring, shared packet output, fail-open behavior, validated input usage, zero, absent, invalid, and failed usage |
+| `adapters/antigravity/hooks/tests/antigravity-hooks.test.js` | Antigravity Stop adapter | Plugin wiring, measured transcript usage, and fail-open behavior |
 
 All exit 0 on success, 1 on failure. Safe to run without a product repo or PowerShell installed (tests that need `pwsh` say skipped);
 `session-context.test.js` stubs the Resolve-TicketRoot path (script not found → graceful degrade). The hook runs `scripts/ticket/Resolve-TicketRoot.ps1` only; the old root forwarder is gone.

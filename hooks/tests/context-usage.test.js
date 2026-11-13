@@ -14,7 +14,7 @@ const path = require("path");
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "ctx-usage-"));
 process.env.TMO_CTX_USAGE_FILE = path.join(TMP, "usage.json");
 delete process.env.TMO_CONTEXT_WINDOW;
-const { record, fromTranscript } = require("../core/context-usage.js");
+const { record, fromTranscript, fromTokenUsage } = require("../core/context-usage.js");
 const STOP_HOOK = path.join(__dirname, "..", "..", "adapters", "claude", "hooks", "context-usage.js");
 
 function transcript(name, rows) {
@@ -69,6 +69,25 @@ test("switches to a 1M window once usage passes 200k", () => {
 test("returns null for a missing transcript or one with no usage", () => {
   assert.strictEqual(fromTranscript(path.join(TMP, "nope.jsonl")), null);
   assert.strictEqual(fromTranscript(transcript("c.jsonl", [{ type: "user" }])), null);
+});
+
+test("normalizes Codex input token usage without double-counting cached tokens", () => {
+  assert.strictEqual(fromTokenUsage({ input_tokens: 100000, cached_input_tokens: 90000 }), 50);
+  assert.strictEqual(fromTokenUsage({ input_tokens: 300000, cached_input_tokens: 100000 }), 30);
+});
+
+test("uses configured Codex context window and accepts measured zero input", () => {
+  process.env.TMO_CONTEXT_WINDOW = "400000";
+  assert.strictEqual(fromTokenUsage({ input_tokens: 100000 }), 25);
+  assert.strictEqual(fromTokenUsage({ input_tokens: 0 }), 0);
+  delete process.env.TMO_CONTEXT_WINDOW;
+});
+
+test("returns null for absent or invalid Codex token usage", () => {
+  assert.strictEqual(fromTokenUsage(null), null);
+  assert.strictEqual(fromTokenUsage({}), null);
+  assert.strictEqual(fromTokenUsage({ input_tokens: -1 }), null);
+  assert.strictEqual(fromTokenUsage({ input_tokens: "100" }), null);
 });
 
 test("record keeps latest and per-session entries", () => {

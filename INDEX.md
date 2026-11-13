@@ -32,7 +32,7 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [_shared/review-protocol.md](_shared/review-protocol.md) | review focus areas and rule sources | code review, conventions, security, tests |
 | [_shared/performance-ci.md](_shared/performance-ci.md) | review of query cost and pipeline gates | performance, N+1, unbounded query, CI, pipeline gate |
 | [_shared/model-routing.md](_shared/model-routing.md) | tier contract for plans and lanes | tier, fast, standard, deep, frontier |
-| [_shared/harness-verbs.md](_shared/harness-verbs.md) | IDE-neutral verbs and their per-IDE tools | ask-user, dispatch, enter-plan, report-context |
+| [_shared/harness-verbs.md](_shared/harness-verbs.md) | IDE-neutral verbs and their per-IDE tools (Cursor, Claude Code, Codex, Antigravity) | ask-user, dispatch, enter-plan, report-context |
 | [_shared/adr-policy.md](_shared/adr-policy.md) | `profile.adrIndex` is set | ADR, consult, cite |
 | [_shared/runtime-verify.md](_shared/runtime-verify.md) | stack recycle, UI verify, browser pass, local login | token rails, stack smoke, CDP, local login |
 | [_shared/test-verification.md](_shared/test-verification.md) | scoped tests | tests, regression |
@@ -97,7 +97,8 @@ One row per doc. Search here before Grep. Add your overlay docs to the last tabl
 | [adapters/gpt/model-usage.md](adapters/gpt/model-usage.md) | Cursor chat on a GPT picker | GPT, tiers |
 | [adapters/claude/README.md](adapters/claude/README.md) · [model-usage.md](adapters/claude/model-usage.md) | Claude Code install, snapshot refresh, tier map | Claude Code, plugin, marketplace |
 | [adapters/claude/workspace-CLAUDE.md](adapters/claude/workspace-CLAUDE.md) | template for the workspace `CLAUDE.md` | CLAUDE.md, overlay |
-| [adapters/codex/README.md](adapters/codex/README.md) · [model-usage.md](adapters/codex/model-usage.md) | Codex install and tier map | Codex, spawn_agent |
+| [adapters/codex/README.md](adapters/codex/README.md) · [model-usage.md](adapters/codex/model-usage.md) | Codex install, hooks, and tier map | Codex, spawn_agent, hooks, PostModelRequest |
+| [adapters/antigravity/README.md](adapters/antigravity/README.md) · [model-usage.md](adapters/antigravity/model-usage.md) · [SETUP.md](adapters/antigravity/SETUP.md) | Antigravity install, hooks, and tier map | Antigravity, invoke_subagent, plugin, hooks |
 | [output-styles/engineering-mode.md](output-styles/engineering-mode.md) | Claude Code engineering-mode output style | output style |
 | [rules/model-usage.mdc](rules/model-usage.mdc) · [rules/workspace-context.mdc](rules/workspace-context.mdc) | Cursor rule stubs | rules |
 | [rules/security.mdc](rules/security.mdc) | review must not introduce a security gap | security, secrets, SQL injection, auth |
