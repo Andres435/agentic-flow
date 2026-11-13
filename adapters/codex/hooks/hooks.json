@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/hooks/session-context.js\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostModelRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/adapters/codex/hooks/context-usage.js\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

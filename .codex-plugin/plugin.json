@@ -6,5 +6,6 @@
     "name": "Andres Quintana"
   },
   "skills": "./skills/",
-  "commands": "./commands/"
+  "commands": "./commands/",
+  "hooks": "./adapters/codex/hooks/hooks.json"
 }

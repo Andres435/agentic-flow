@@ -1,0 +1,11 @@
+{
+  "name": "agentic",
+  "version": "1.0.0",
+  "description": "Ticket workflow. Cursor, Claude Code, Codex, and Antigravity load the same skills; install this plugin in Antigravity to use them.",
+  "author": {
+    "name": "Andres Quintana"
+  },
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "hooks": "./adapters/antigravity/hooks/hooks.json"
+}
